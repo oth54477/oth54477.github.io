@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="측정으로 검증하는 프론트엔드 엔지니어 오태훈의 포트폴리오">
+<title>오태훈 포트폴리오</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --surface: #151a21;
+    --line: #242c37;
+    --text: #e9edf2;
+    --muted: #97a1ad;
+    --faint: #6a7480;
+    --accent: #f0a742;
+    --accent-dim: rgba(240, 167, 66, 0.14);
+    --mono: "Space Grotesk", ui-monospace, "SF Mono", monospace;
+    --body: "Noto Sans KR", "Inter", -apple-system, "Apple SD Gothic Neo", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(240,167,66,.35); }
+  a:hover { border-bottom-color: var(--accent); }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- hero ---------- */
+  header { padding: 96px 0 72px; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 20px;
+  }
+  h1 {
+    font-size: clamp(30px, 5.4vw, 46px);
+    line-height: 1.32;
+    letter-spacing: -0.015em;
+    margin: 0 0 24px;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+  h1 .amber { color: var(--accent); }
+  .hero-sub { color: var(--muted); max-width: 62ch; margin: 0 0 32px; }
+  .hero-meta {
+    display: flex; flex-wrap: wrap; gap: 10px 28px;
+    font-family: var(--mono); font-size: 13.5px; color: var(--faint);
+  }
+  .hero-meta strong { color: var(--text); font-weight: 500; }
+
+  /* ---------- metrics ---------- */
+  .metrics { padding: 56px 0; border-bottom: 1px solid var(--line); }
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 28px 20px;
+  }
+  .metric .num {
+    font-family: var(--mono);
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .metric .num .unit { font-size: 0.55em; color: var(--muted); font-weight: 500; margin-left: 2px; }
+  .metric .num .arrow { color: var(--accent); font-weight: 500; }
+  .metric .label { font-size: 13px; color: var(--faint); margin-top: 8px; }
+
+  /* ---------- cases ---------- */
+  section.case { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  .case-eyebrow {
+    display: flex; align-items: baseline; gap: 14px;
+    font-family: var(--mono); font-size: 12.5px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 16px;
+  }
+  .case-eyebrow .idx { color: var(--accent); font-weight: 700; }
+  h2 {
+    font-size: clamp(21px, 3vw, 26px);
+    line-height: 1.45; letter-spacing: -0.01em;
+    margin: 0 0 10px; font-weight: 700; text-wrap: balance;
+  }
+  .case-thesis { color: var(--muted); font-size: 15px; margin: 0 0 28px; max-width: 60ch; }
+  dl { margin: 0; display: grid; grid-template-columns: 72px 1fr; gap: 14px 20px; }
+  dt {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); padding-top: 5px;
+  }
+  dd { margin: 0; font-size: 15px; color: var(--text); }
+  dd .m { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+  dd .q { color: var(--muted); }
+  .case-links {
+    margin-top: 24px; display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .case-links a {
+    font-family: var(--mono); font-size: 12.5px;
+    border: 1px solid var(--line); border-radius: 3px; border-bottom-color: var(--line);
+    padding: 6px 12px; color: var(--muted); background: var(--surface);
+  }
+  .case-links a:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ---------- footer ---------- */
+  footer { padding: 72px 0 96px; }
+  footer h2 { margin-bottom: 20px; }
+  .contact { font-family: var(--mono); font-size: 14.5px; display: grid; gap: 8px; }
+  .contact span { color: var(--faint); display: inline-block; width: 76px; }
+
+  /* ---------- deep-dive (계층화) ---------- */
+  details.deep { margin-top: 28px; border-top: 1px dashed var(--line); }
+  details.deep summary {
+    cursor: pointer; list-style: none; user-select: none;
+    font-family: var(--mono); font-size: 12.5px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--faint); padding: 14px 0 10px;
+  }
+  details.deep summary::-webkit-details-marker { display: none; }
+  details.deep summary::before { content: "+"; color: var(--accent); font-weight: 700; margin-right: 10px; }
+  details.deep[open] summary::before { content: "\2013"; }
+  details.deep summary:hover { color: var(--accent); }
+  .deep-body { padding: 4px 0 10px; display: grid; gap: 22px; }
+  .deep-body h3 {
+    font-family: var(--mono); font-size: 12px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 10px;
+  }
+  .deep-body p, .deep-body li { font-size: 14.5px; color: var(--muted); }
+  .deep-body ul { margin: 0; padding-left: 18px; display: grid; gap: 7px; }
+  .deep-body .m, .misc .m { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+  pre {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+    padding: 16px 18px; overflow-x: auto; margin: 0;
+    font-size: 12.5px; line-height: 1.65;
+  }
+  pre code { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  pre .c { color: var(--faint); }
+  dd code, p code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.88em; background: var(--surface);
+    padding: 1px 6px; border-radius: 3px;
+  }
+  .tbl-wrap { overflow-x: auto; }
+  .tbl-wrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; line-height: 1.55; }
+  .tbl-wrap th {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--faint); text-align: left;
+  }
+  .tbl-wrap th, .tbl-wrap td { padding: 9px 16px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .tbl-wrap td { color: var(--muted); }
+  .tbl-wrap td.fx { color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 500; }
+  figure { margin: 0; }
+  figure svg { max-width: 100%; height: auto; display: block; color: var(--muted); }
+  figcaption { font-size: 12.5px; color: var(--faint); margin-top: 12px; }
+
+  /* ---------- misc list ---------- */
+  ul.misc { margin: 0; padding: 0; list-style: none; display: grid; gap: 16px; }
+  ul.misc li { font-size: 14.5px; color: var(--muted); padding-left: 18px; position: relative; }
+  ul.misc li::before {
+    content: ""; position: absolute; left: 0; top: 0.6em;
+    width: 6px; height: 6px; background: var(--accent);
+  }
+  ul.misc strong { color: var(--text); font-weight: 700; }
+
+  /* ---------- motion ---------- */
+  .rv { opacity: 0; transform: translateY(14px); }
+  @media (prefers-reduced-motion: reduce) {
+    .rv { opacity: 1 !important; transform: none !important; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* ---------- print (⌘P → PDF) ---------- */
+  @media print {
+    :root {
+      --bg: #ffffff; --surface: #f6f4ef; --line: #d8d4cb;
+      --text: #1c1a16; --muted: #55524b; --faint: #7a766d;
+      --accent: #a15c00; --accent-dim: rgba(161, 92, 0, 0.1);
+    }
+    body { font-size: 12.5px; line-height: 1.6; }
+    .rv { opacity: 1 !important; transform: none !important; }
+    header { padding: 24px 0 28px; }
+    .metrics { padding: 24px 0; }
+    section.case { padding: 28px 0; break-inside: avoid; }
+    footer { padding: 28px 0; }
+    a { border-bottom: none; }
+    .case-links a { background: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow rv">Frontend Engineer · Platform &amp; Build Architecture</p>
+    <h1 class="rv">기능을 만드는 것과<br>
+      <span class="amber">동작함을 판정 가능하게</span> 만드는 것은<br>같은 작업이다.</h1>
+    <p class="hero-sub rv">오태훈. 여러 팀의 프론트엔드 앱을 하나의 제품으로 묶는 플랫폼 계층을 3년간
+      담당했습니다. 도구의 오탐과 제 자신의 진단 오류까지 실측으로 검증하고 정정하는 것을
+      습관으로 삼습니다.</p>
+    <div class="hero-meta rv">
+      <div><strong>github.com/oth54477</strong></div>
+      <div><strong>oth5447@naver.com</strong></div>
+      <div>온프레미스 클라우드 관리 플랫폼 · B2B 어드민</div>
+    </div>
+  </header>
+
+  <div class="metrics">
+    <div class="metrics-grid">
+      <div class="metric rv">
+        <div class="num"><span data-count="636">636</span><span class="arrow">→</span><span data-count="158">158</span><span class="unit">초</span></div>
+        <div class="label">CI 파이프라인 총시간 (4.0배)</div>
+      </div>
+      <div class="metric rv">
+        <div class="num"><span data-count="169">169</span><span class="arrow">→</span><span data-count="3">3</span><span class="unit">건</span></div>
+        <div class="label">순환 의존 (−98%)</div>
+      </div>
+      <div class="metric rv">
+        <div class="num">10<span class="unit">초</span><span class="arrow">→</span>&lt;1<span class="unit">초</span></div>
+        <div class="label">개발 서버 HMR</div>
+      </div>
+      <div class="metric rv">
+        <div class="num">v1.20.3</div>
+        <div class="label">@module-federation/vite upstream PR 머지·릴리스</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="case">
+    <div class="case-eyebrow rv"><span class="idx">01</span><span>Open Source · Module Federation</span></div>
+    <h2 class="rv">빌드는 성공하는데 배포하면 죽는 결함, upstream에서 고쳤다</h2>
+    <p class="case-thesis rv">CI가 원리적으로 못 잡는 조용한 실패 — 이슈 등록부터 릴리스 반영까지 하루.</p>
+    <dl>
+      <dt class="rv">문제</dt>
+      <dd class="rv"><code>eager: true</code> shared 사용 시 프로덕션 빌드 산출물이 부팅 시점에 크래시.
+        빌드는 EXIT 0·경고 0으로 정상 종료 — 배포 후 런타임에만 드러난다.</dd>
+      <dt class="rv">접근</dt>
+      <dd class="rv">5개 버전 영향 매트릭스로 결함 도입 버전을 실측 정정(1.16.1 → <span class="m">1.17.0</span>).
+        재현 필요조건 3가지를 분리해 <span class="m">파일 6개</span> 최소 재현으로 축소.
+        원인이 번들러가 아니라 플러그인의 정규식 후처리임을 산출물 수준에서 특정 —
+        네임스페이스 import가 "함수 호출이 없다"는 이유로 삭제되고 있었다.</dd>
+      <dt class="rv">결과</dt>
+      <dd class="rv">첫 수정안이 기존 테스트를 깨뜨리자 판정 기준 자체를 "호출되는가"에서 "참조되는가"로
+        교체. <span class="m">PR 머지 → v1.20.3 릴리스</span>, upstream 테스트 1,017개 통과.
+        <span class="q">"빌드 성공"과 "산출물이 동작함"은 다른 명제다.</span></dd>
+    </dl>
+    <details class="deep rv">
+      <summary>자세히 — 결함의 구조와 규명 과정</summary>
+      <div class="deep-body">
+        <div>
+          <h3>결함의 구조 (단순화한 요지)</h3>
+          <pre><code><span class="c">// 플러그인 후처리: Vite preload 헬퍼를 지우려는 정규식이 모듈 경로를 보지 않고</span>
+<span class="c">// `{ _ as X }` 형태의 import를 전부 매칭한 뒤, X의 "함수 호출"이 없으면 문장째 삭제한다.</span>
+<span class="c">// 네임스페이스 import는 값으로만 참조되므로 여기 걸려 지워졌다.</span>
+if (!hasCall(local, chunk)) dropImportStatement()          <span class="c">// 판정: 호출되는가</span>
+
+<span class="c">// 수정(v1.20.3): 판정 기준을 "참조되는가"로 교체 — 기존 동작 보존, 결함만 제거</span>
+if (!new RegExp(`\\b${local}\\b`).test(chunk)) dropImportStatement()</code></pre>
+        </div>
+        <div>
+          <h3>과정</h3>
+          <ul>
+            <li>사내 빌드에서 증상 발견 — 기존 보고 이슈 0건인 미보고 결함. 사내 코드 주석의 "1.16.1부터"가 실측으로는 <span class="m">1.17.0부터</span>임도 함께 정정</li>
+            <li>초기 합성 재현이 실패한 원인을 청크 토폴로지 차이로 좁혀, 재현 필요조건 3가지(eager shared · 다중 entry · 앱 소스의 런타임 직접 import)를 분리</li>
+            <li>빌드 중 정규식 콜백에 로그를 심어 삭제되는 문장을 직접 포착 — 어느 후처리 단계인지까지 특정</li>
+            <li>메인테이너가 1.5시간 만에 머지한 별도 수정이 호출부만 제거한 것임을 지적하고 근본 수정 PR로 연결</li>
+            <li>회귀 테스트가 fix 없이는 실패함을 확인하고, 배포 tarball에 수정 판정식이 실제로 들어갔는지까지 검증</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+    <div class="case-links rv">
+      <a href="https://github.com/module-federation/vite/pull/1014">PR #1014</a>
+      <a href="https://github.com/module-federation/vite/issues/1011">Issue #1011</a>
+      <a href="https://github.com/oth54477/mf-vite-eager-shared-repro">최소 재현 repo</a>
+    </div>
+  </section>
+
+  <section class="case">
+    <div class="case-eyebrow rv"><span class="idx">02</span><span>Architecture · Vite ↔ Webpack</span></div>
+    <h2 class="rv">이종 번들러 Module Federation — 도입했고, 데이터로 뒤집었다</h2>
+    <p class="case-thesis rv">"전체를 마이그레이션해야 한다"는 전제를 POC 하나로 반박하고 1년 6개월 프로덕션 운영.</p>
+    <dl>
+      <dt class="rv">문제</dt>
+      <dd class="rv">기존 솔루션은 Webpack + Vue 3, 신규 Host는 React + Vite. 전체 마이그레이션
+        비용 때문에 기술 전환 자체가 막혀 있었다.</dd>
+      <dt class="rv">접근</dt>
+      <dd class="rv">Vite(Host) ↔ Webpack(Remote) 런타임 통신을 POC로 먼저 입증하고 프로덕션 규모로 확장.
+        React Query와 Vue Query가 <span class="m">단일 Query Client</span>를 공유하도록 통합해
+        두 프레임워크가 같은 API 캐시를 참조.</dd>
+      <dt class="rv">결과</dt>
+      <dd class="rv">HMR <span class="m">10초 → 1초 미만</span>, 서비스 중단 없이 점진적 React 전환 경로 확보.
+        6개월 운영 데이터로 런타임 유연성의 비용(파드 4개 상주·월 2~3건 통합 장애)을 정량화해
+        <span class="m">빌드 시점 통합(모노레포) 전환을 설계</span> —
+        <span class="q">자신이 도입한 아키텍처를 데이터로 부정하는 것도 같은 사이클의 일부다.</span></dd>
+    </dl>
+    <details class="deep rv">
+      <summary>자세히 — 구조도와 운영 중 잡은 결함</summary>
+      <div class="deep-body">
+        <figure>
+          <svg viewBox="0 0 660 330" role="img" aria-label="React와 Vite 기반 Host가 번들러 경계를 넘어 Webpack 기반 Vue Remote 3개를 런타임에 로드하고, 하나의 shared scope와 단일 Query Client를 공유하는 구조">
+            <defs>
+              <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+              </marker>
+            </defs>
+            <rect x="30" y="85" width="190" height="115" rx="4" fill="none" stroke="currentColor"/>
+            <text x="125" y="130" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">Host</text>
+            <text x="125" y="152" text-anchor="middle" font-size="11.5" fill="currentColor">React 18 · Vite · ESM</text>
+            <line x1="330" y1="24" x2="330" y2="240" style="stroke: var(--accent)" stroke-dasharray="5 5"/>
+            <text x="330" y="14" text-anchor="middle" font-size="11" style="fill: var(--accent)">번들러 경계 (ESM ↔ webpack)</text>
+            <rect x="440" y="30" width="190" height="52" rx="4" fill="none" stroke="currentColor"/>
+            <text x="535" y="61" text-anchor="middle" font-size="11.5" fill="currentColor">Remote A — Vue 3 · Webpack</text>
+            <rect x="440" y="100" width="190" height="52" rx="4" fill="none" stroke="currentColor"/>
+            <text x="535" y="131" text-anchor="middle" font-size="11.5" fill="currentColor">Remote B — Vue 3 · Webpack</text>
+            <rect x="440" y="170" width="190" height="52" rx="4" fill="none" stroke="currentColor"/>
+            <text x="535" y="201" text-anchor="middle" font-size="11.5" fill="currentColor">Remote C — Vue 3 · Webpack</text>
+            <line x1="220" y1="115" x2="438" y2="58" stroke="currentColor" marker-end="url(#ah)"/>
+            <line x1="220" y1="142" x2="438" y2="126" stroke="currentColor" marker-end="url(#ah)"/>
+            <line x1="220" y1="170" x2="438" y2="196" stroke="currentColor" marker-end="url(#ah)"/>
+            <text x="325" y="86" text-anchor="middle" font-size="11" fill="currentColor">remoteEntry 런타임 로드</text>
+            <line x1="125" y1="200" x2="125" y2="258" stroke="currentColor" stroke-dasharray="3 4"/>
+            <line x1="535" y1="222" x2="535" y2="258" stroke="currentColor" stroke-dasharray="3 4"/>
+            <rect x="30" y="260" width="600" height="52" rx="4" fill="none" stroke="currentColor" stroke-dasharray="3 4"/>
+            <text x="330" y="291" text-anchor="middle" font-size="11.5" fill="currentColor">shared scope — 단일 TanStack Query Client (React ↔ Vue가 같은 API 캐시 참조)</text>
+          </svg>
+          <figcaption>이종 번들러 구조 — Host(Vite·ESM)가 경계 너머의 Webpack Remote 3개를 런타임에 로드하고, 상태는 하나의 shared scope로 공유한다.</figcaption>
+        </figure>
+        <div>
+          <h3>운영 중 잡은 결함</h3>
+          <ul>
+            <li><strong>shared 버전 오보</strong> — Host가 실제 번들한 것과 다른 버전을 공유 스코프에 광고해, singleton 승자 선정이 왜곡될 수 있던 상태를 빌드 산출물 manifest와 설치 트리 실측 대조로 규명·수정. 재발 방지 가드를 빌드에 내장하고 <span class="m">일부러 깨뜨려 실제로 차단됨을 역방향 검증</span></li>
+            <li><strong>로컬은 통과·CI만 실패하는 빌드</strong> — 플러그인의 의존 버전 조회가 패키지 매니저 hoist 승자(설치 형태에 따라 달라지는 비결정 값)로 풀린다는 점을 규명. 컨테이너 없이 hoist 디렉터리만 조작해 <span class="m">CI 실패를 로컬에서 결정적으로 재현</span>하고, 실제 번들되는 사본에서 읽은 버전을 주입해 비결정성 의존 자체를 제거</li>
+            <li><strong>메모리 누수</strong> — React와 Vue의 생명주기 차이로 발생한 구독 누수를 cleanup 로직 분리(unmount 시 리스너 정리·구독 해제)로 해결</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section class="case">
+    <div class="case-eyebrow rv"><span class="idx">03</span><span>Performance · CI Pipeline</span></div>
+    <h2 class="rv">CI 636초 → 158초 — 채택한 조치만큼 철회한 조치가 산출물</h2>
+    <p class="case-thesis rv">잡을 빠르게 만드는 것과 파이프라인을 빠르게 만드는 것은 다른 문제였다.</p>
+    <dl>
+      <dt class="rv">규명</dt>
+      <dd class="rv">정적분석 350초 중 <span class="m">269초가 분석이 아니라 파일 트리 순회</span> —
+        pnpm 심볼릭 링크가 실파일 7.5만 개를 33만 경로로 부풀리고 있었다.
+        CPU를 두 배로 늘려도 총시간이 그대로인 원인을 스케줄링(큐잉 76초 + 스테이지 직렬화 82초)으로
+        특정해 사장시간 <span class="m">82초 → 3초</span>.</dd>
+      <dt class="rv">규율</dt>
+      <dd class="rv">직접 넣은 조치 2건을 실측으로 철회. 절감폭 −68%짜리 안은 "이후 모든 테스트가
+        실행 순서를 의식해야 하는 영구 부채"라는 이유로 의도적 보류. 대조군 표준편차가 목표 효과를
+        압도하자 <span class="m">"측정 불가"를 계산으로 판정</span>하고 중단.
+        <span class="q">좋은 수치가 항상 채택 근거는 아니다.</span></dd>
+      <dt class="rv">결과</dt>
+      <dd class="rv">파이프라인 <span class="m">636초 → 158초(4.0배)</span>, 정적분석 잡 <span class="m">350초 → 80초(4.4배)</span>.</dd>
+    </dl>
+    <details class="deep rv">
+      <summary>자세히 — 병목별 측정 분해와 철회 기록</summary>
+      <div class="deep-body">
+        <div>
+          <h3>병목별 분해</h3>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>병목</th><th>원인 (실측)</th><th>조치</th><th>효과</th></tr></thead>
+              <tbody>
+                <tr><td>정적분석 스캔</td><td>순회 86만 경로 — pnpm 심볼릭 링크가 실파일 7.5만 개를 33만 경로로 증폭, 제외 설정은 순회를 막지 않음</td><td>스캔 루트를 실제 대상만 열거 (순회 → 약 2.8만 경로)</td><td class="fx">350 → 80초</td></tr>
+                <tr><td>캐시 아카이빙</td><td>4개 잡이 동일한 2.5GB 캐시를 각각 push</td><td>쓰기를 임계 경로 밖 잡으로 한정</td><td class="fx">잡당 −35~39초</td></tr>
+                <tr><td>테스트 환경</td><td>전역 jsdom 설정이 파일 단위 환경 선언과 충돌 — DOM 불필요한 167개 파일이 비용 지불</td><td>기본값 반전 + 누락 독블록 6개 보강 (전수 실행으로 확인)</td><td class="fx">91 → 59초</td></tr>
+                <tr><td>러너 자원</td><td>호스트 14코어 중 4개만 VM에 할당</td><td>VM 8코어로 확장 (공용 머신이라 메모리는 불변)</td><td class="fx">vitest 124 → 58초</td></tr>
+                <tr><td>스케줄링</td><td>슬롯 부족 76초 큐잉(queued_duration으로 확인) + 의존 없는 잡의 스테이지 직렬화 82초</td><td>concurrent 확장 + needs: []</td><td class="fx">사장 82 → 3초</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h3>철회·보류 기록</h3>
+          <ul>
+            <li><strong>pnpm store 이전 — 폐기.</strong> 정적분석은 목표대로 빨라졌지만 테스트 잡이 <span class="m">165 → 241초</span>로 악화 — 매 잡 1,256개 패키지 재다운로드가 디스크를 처닝해 테스트 전 구간을 1.7배 늦춤</li>
+            <li><strong>node_modules 캐시 제거 — 착수 전 보류.</strong> restore −6초 대비 install +10~20초로 산술이 반대</li>
+            <li><strong>테스트 격리 해제(−68%) — 의도적 보류.</strong> 깨지는 18개 파일의 원인을 모듈 레지스트리 재사용 하나로 수렴시킨 뒤, 비용이 코드가 아니라 이후 모든 테스트가 실행 순서를 의식해야 하는 영구 부채임을 밝힘</li>
+            <li><strong>후속 안 CI 검증 — 측정 불가 판정.</strong> 대조군 표준편차 35초가 목표 효과 15초를 압도, 검정력 80%에 한 쪽당 80회 이상 필요함을 계산하고 중단. 대신 분산 자체(같은 잡이 2.3배 흔들림)가 러너 경합이라는 별개 문제임을 분리 기록</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section class="case">
+    <div class="case-eyebrow rv"><span class="idx">04</span><span>Test Infrastructure · Compiler Plugin</span></div>
+    <h2 class="rv">E2E 식별자 자동 부여 — 가장 자신 있던 결론을 스스로 반증했다</h2>
+    <p class="case-thesis rv">이미 발행한 문서를 정정하고 주입 축을 컴파일 타임으로 재설계.</p>
+    <dl>
+      <dt class="rv">반증</dt>
+      <dd class="rv">"호스트 1회 배선으로 타 팀 공수 70~85 인일 소거"라는 자기 결론을 적대적 검증으로 기각 —
+        런타임 정보로는 데이터 건수·권한·정렬에 흔들리지 않는 식별자를 만들 수 없다
+        (실측: 라우트당 동종 컴포넌트 26개 이상).</dd>
+      <dt class="rv">설계</dt>
+      <dd class="rv">Vue 컴파일러 <code>nodeTransform</code>으로 빌드 타임 주입. 템플릿 AST에서 업무 의미를
+        추출하는 <span class="m">9단계 폴백</span> + 위치 기반 스냅샷 병합으로 문구 수정이 테스트를
+        깨뜨리지 않게. 해결 안 되는 구간은 "해결했다" 대신 미보증 등급으로 정직하게 표기.</dd>
+      <dt class="rv">결과</dt>
+      <dd class="rv">보증 등급 요소 자동 라벨 도달률 <span class="m">83.2%</span>, 식별자 충돌 <span class="m">0건</span>.
+        덤: 플러그인 테스트가 프로덕션과 다른 옵션으로 돌던 사각지대를 발견,
+        빌드 산출물 스냅샷 대조 검증을 추가해 숨은 결함 수정.</dd>
+    </dl>
+    <details class="deep rv">
+      <summary>자세히 — 반증의 근거와 설계 장치</summary>
+      <div class="deep-body">
+        <div>
+          <h3>반증의 근거</h3>
+          <ul>
+            <li>런타임 자동 ID의 소스 후보를 실측으로 차례로 기각 — 라벨 조합은 다국어·시트 동기화로 불안정, 대안으로 직접 제안한 i18n 키 파생도 <span class="m">키의 97.7%가 한국어 원문 문장</span>이라 문구 수정 시 키가 바뀌어 안정성이 동일함을 확인하고 자기 추천을 정정</li>
+            <li>중복 수가 데이터 건수·권한·정렬에 따라 실행 중 변동 — 원격 솔루션 라우트당 동종 컴포넌트 <span class="m">26개 이상</span> 실측</li>
+            <li>이미 발행한 문서를 즉시 정정 발행 — 결론이 틀렸으면 정정 기록을 남기는 것까지가 검증</li>
+          </ul>
+        </div>
+        <div>
+          <h3>설계 장치</h3>
+          <ul>
+            <li><strong>9단계 라벨 폴백</strong> — 템플릿 AST에서 i18n 라벨 → aria-label → v-model 경로 → 이벤트 핸들러명 → 아이콘명 순으로 업무 의미를 추출, i18n 사전을 한→영 슬러그 변환에 재활용해 사전 구축 비용 0</li>
+            <li><strong>위치 기반 스냅샷 병합</strong> — 슬롯(위치)을 키로 잡고 기존 ID를 유지해, 문구 수정이 E2E 로케이터를 조용히 깨뜨리는 경로를 구조적으로 차단</li>
+            <li><strong>1 노드 → N 인스턴스 대응</strong> — v-for는 :key 접미로 런타임 고유화, 다중 인스턴스 컴포넌트는 호출처가 접두를 내려주는 testid prop 계약 신설(자식 30종·호출처 101곳 자동 배선)</li>
+            <li><strong>미보증 2등급 체계</strong> — 해결 안 되는 반복 렌더 구간은 "해결했다" 대신 미보증 등급으로 표기해 수기 보완 큐로 이관</li>
+          </ul>
+        </div>
+        <div>
+          <h3>검증</h3>
+          <ul>
+            <li>플러그인 단위 테스트가 프로덕션과 다른 컴파일 옵션(prefixIdentifiers off)으로 돌고 있음을 발견 — 전체 3,500여 건 그린 상태에서 실제 빌드에는 주입되지 않던 케이스를 <span class="m">빌드 산출물 덤프·스냅샷 대조</span>로 적발·수정</li>
+            <li>보증 등급 요소 자동 라벨 도달률 83.2% (완료 기준 80%) · ID 211개 충돌 0 · 수기 100곳 예상 작업을 자동화로 대체</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section class="case">
+    <div class="case-eyebrow rv"><span class="idx">05</span><span>Selected Work</span></div>
+    <h2 class="rv">그 밖의 작업</h2>
+    <ul class="misc rv">
+      <li><strong>접근 제어(RBAC) 개편 — 설계 선행으로 무음 데이터 손실 차단.</strong> 코드 작성 전 기존 구현 전량 분석과 기획 대조로 요구사항의 논리 모순 4건을 해소하고, 저장 시 권한이 조용히 소실되는 경로 3종을 pass-through 설계로 차단. 프론트 설계 변경으로 백엔드 협의 항목 <span class="m">6건 → 3건</span></li>
+      <li><strong>통과하는 테스트 뒤에 숨은 결함 규명.</strong> 한 번도 동작한 적 없던 30초 타임아웃 안전망(setTimeout 콜백의 throw가 try/catch에 도달하지 못하는데 fake timer 특성으로 테스트는 통과), 로그아웃 무한 리로드 루프(HTTP-only 쿠키 + 세션 재검증 상태 불일치), 프로덕션 console·소스맵 유출(minifier 불일치로 이중 무력화된 설정) — 수정 전 소스로 되돌려 신규 테스트가 전부 실패함을 확인하는 <span class="m">역방향 검증</span>을 습관화</li>
+      <li><strong>사내 AI 개발 인프라 구축.</strong> 팀 공용 서버에 AI 게이트웨이 + 로컬 LLM 라우팅 환경을 구축. 실행 전 감사로 용량 전제 8배 과대평가 등 치명 결함 3건 차단, 구축 중 관리자 기본 비밀번호 노출을 실제 로그인으로 실증하고 자격증명 연결 전 차단. 메모리 대역폭 계산으로 MoE 아키텍처 전환 — 실측 <span class="m">dense 대비 2.5배</span> 처리량</li>
+      <li><strong>Storybook을 회귀 방지 게이트로 전환.</strong> 렌더 스모크(전 스토리 jsdom 마운트) + 8테마 비주얼 회귀 136장 구축, 모든 게이트를 고의 파손으로 역검증. CI 검증이 전무하던 공통 컴포넌트 패키지를 파이프라인에 편입</li>
+      <li><strong>i18n 동기화 무음 삭제 규명.</strong> 다국어 파이프라인이 수동 편집분을 경고 없이 삭제하는 구조적 결함을 규명 — 초기 관측치의 74%가 diff 오탐(줄 이동)임을 시트 덤프·로직 재현으로 걸러내 실제 영향을 5건으로 특정, 과거 동일 원인의 키 266개 소실 이력까지 추적</li>
+    </ul>
+  </section>
+
+  <footer>
+    <h2 class="rv">연락처</h2>
+    <div class="contact rv">
+      <div><span>GitHub</span><a href="https://github.com/oth54477">github.com/oth54477</a></div>
+      <div><span>Email</span><a href="mailto:oth5447@naver.com">oth5447@naver.com</a></div>
+    </div>
+  </footer>
+</div>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+  window.addEventListener('beforeprint', function () {
+    document.querySelectorAll('details.deep').forEach(function (d) {
+      d.dataset.wasOpen = d.open ? '1' : '';
+      d.open = true;
+    });
+  });
+  window.addEventListener('afterprint', function () {
+    document.querySelectorAll('details.deep').forEach(function (d) {
+      d.open = d.dataset.wasOpen === '1';
+    });
+  });
+  (function () {
+    var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || typeof gsap === 'undefined') {
+      document.querySelectorAll('.rv').forEach(function (el) {
+        el.style.opacity = 1; el.style.transform = 'none';
+      });
+      return;
+    }
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.to('header .rv', { opacity: 1, y: 0, duration: 0.7, stagger: 0.12, ease: 'power2.out' });
+
+    document.querySelectorAll('.metrics, section.case, footer').forEach(function (blk) {
+      gsap.to(blk.querySelectorAll('.rv'), {
+        opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out',
+        scrollTrigger: { trigger: blk, start: 'top 78%' }
+      });
+    });
+
+    document.querySelectorAll('[data-count]').forEach(function (el) {
+      var end = parseInt(el.getAttribute('data-count'), 10);
+      var obj = { v: end };
+      gsap.fromTo(obj, { v: 0 }, {
+        v: end, duration: 1.1, ease: 'power1.out',
+        scrollTrigger: { trigger: el, start: 'top 85%' },
+        onUpdate: function () { el.textContent = Math.round(obj.v); }
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
