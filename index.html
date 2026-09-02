@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="측정으로 검증하는 프론트엔드 엔지니어 오태훈의 포트폴리오">
 <title>오태훈 포트폴리오</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
   :root {
     --bg: #0e1116;
@@ -19,6 +22,11 @@
     --body: "Noto Sans KR", "Inter", -apple-system, "Apple SD Gothic Neo", sans-serif;
   }
   * { box-sizing: border-box; }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
   html { scroll-behavior: smooth; }
   body {
     margin: 0;
@@ -28,6 +36,8 @@
     font-size: 16px;
     line-height: 1.75;
     -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
   a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(240,167,66,.35); }
   a:hover { border-bottom-color: var(--accent); }
@@ -53,18 +63,27 @@
   }
   h1 .amber { color: var(--accent); }
   .hero-sub { color: var(--muted); max-width: 62ch; margin: 0 0 32px; }
-  .hero-meta {
-    display: flex; flex-wrap: wrap; gap: 10px 28px;
-    font-family: var(--mono); font-size: 13.5px; color: var(--faint);
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; }
+  .hero-cta a {
+    font-family: var(--mono); font-size: 13.5px; line-height: 1;
+    padding: 12px 18px; border-radius: 3px; white-space: nowrap;
+    border: 1px solid var(--line); border-bottom-color: var(--line);
+    background: var(--surface); color: var(--text);
+    transition: transform .12s ease, border-color .12s ease, color .12s ease;
   }
-  .hero-meta strong { color: var(--text); font-weight: 500; }
+  .hero-cta a.primary {
+    background: var(--accent); border-color: var(--accent); color: #17130b; font-weight: 700;
+  }
+  .hero-cta a:hover { border-color: var(--accent); color: var(--accent); }
+  .hero-cta a.primary:hover { color: #17130b; filter: brightness(1.08); }
+  .hero-cta a:active { transform: translateY(1px); }
 
   /* ---------- metrics ---------- */
   .metrics { padding: 56px 0; border-bottom: 1px solid var(--line); }
   .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
-    gap: 28px 20px;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 32px 24px;
   }
   .metric .num {
     font-family: var(--mono);
@@ -87,7 +106,6 @@
     letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--faint); margin-bottom: 16px;
   }
-  .case-eyebrow .idx { color: var(--accent); font-weight: 700; }
   h2 {
     font-size: clamp(21px, 3vw, 26px);
     line-height: 1.45; letter-spacing: -0.01em;
@@ -131,6 +149,7 @@
   details.deep[open] summary::before { content: "\2013"; }
   details.deep summary:hover { color: var(--accent); }
   .deep-body { padding: 4px 0 10px; display: grid; gap: 22px; }
+  .deep-body > *, dl > dd, .metric { min-width: 0; }
   .deep-body h3 {
     font-family: var(--mono); font-size: 12px; font-weight: 500;
     letter-spacing: 0.1em; text-transform: uppercase;
@@ -144,6 +163,7 @@
     padding: 16px 18px; overflow-x: auto; margin: 0;
     font-size: 12.5px; line-height: 1.65;
   }
+  pre, pre code { word-break: normal; overflow-wrap: normal; }
   pre code { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
   pre .c { color: var(--faint); }
   dd code, p code {
@@ -174,6 +194,15 @@
   }
   ul.misc strong { color: var(--text); font-weight: 700; }
 
+  /* ---------- mobile ---------- */
+  @media (max-width: 600px) {
+    dl { grid-template-columns: 1fr; gap: 6px 0; }
+    dt { padding-top: 14px; }
+    dt:first-of-type { padding-top: 0; }
+    .hero-cta a { flex: 1 1 auto; text-align: center; }
+    .contact span { width: auto; margin-right: 10px; }
+  }
+
   /* ---------- motion ---------- */
   .rv { opacity: 0; transform: translateY(14px); }
   @media (prefers-reduced-motion: reduce) {
@@ -196,22 +225,24 @@
     footer { padding: 28px 0; }
     a { border-bottom: none; }
     .case-links a { background: none; }
+    .hero-cta { display: none; }
+    pre, .tbl-wrap table, figure, .deep-body > div { break-inside: avoid; }
   }
 </style>
 </head>
 <body>
+<noscript><style>.rv { opacity: 1 !important; transform: none !important; }</style></noscript>
+
 <div class="wrap">
   <header>
     <p class="eyebrow rv">Frontend Engineer · Platform &amp; Build Architecture</p>
-    <h1 class="rv">기능을 만드는 것과<br>
-      <span class="amber">동작함을 판정 가능하게</span> 만드는 것은<br>같은 작업이다.</h1>
-    <p class="hero-sub rv">오태훈. 여러 팀의 프론트엔드 앱을 하나의 제품으로 묶는 플랫폼 계층을 3년간
-      담당했습니다. 도구의 오탐과 제 자신의 진단 오류까지 실측으로 검증하고 정정하는 것을
-      습관으로 삼습니다.</p>
-    <div class="hero-meta rv">
-      <div><strong>github.com/oth54477</strong></div>
-      <div><strong>oth5447@naver.com</strong></div>
-      <div>온프레미스 클라우드 관리 플랫폼 · B2B 어드민</div>
+    <h1 class="rv">기능을 만드는 것과 <span class="amber">동작함을 판정 가능하게</span> 만드는 것은 같은 작업이다.</h1>
+    <p class="hero-sub rv">오태훈. 온프레미스 클라우드 관리 플랫폼(B2B 어드민)에서 여러 팀의 프론트엔드 앱을
+      하나의 제품으로 묶는 플랫폼 계층을 3년간 담당했습니다. 도구의 오탐과 제 자신의 진단 오류까지
+      실측으로 검증하고 정정하는 것을 습관으로 삼습니다.</p>
+    <div class="hero-cta rv">
+      <a class="primary" href="mailto:oth5447@naver.com">이메일 보내기</a>
+      <a href="https://github.com/oth54477">GitHub</a>
     </div>
   </header>
 
@@ -237,7 +268,7 @@
   </div>
 
   <section class="case">
-    <div class="case-eyebrow rv"><span class="idx">01</span><span>Open Source · Module Federation</span></div>
+    <div class="case-eyebrow rv"><span>Open Source · Module Federation</span></div>
     <h2 class="rv">빌드는 성공하는데 배포하면 죽는 결함, upstream에서 고쳤다</h2>
     <p class="case-thesis rv">CI가 원리적으로 못 잡는 조용한 실패 — 이슈 등록부터 릴리스 반영까지 하루.</p>
     <dl>
@@ -287,7 +318,7 @@ if (!new RegExp(`\\b${local}\\b`).test(chunk)) dropImportStatement()</code></pre
   </section>
 
   <section class="case">
-    <div class="case-eyebrow rv"><span class="idx">02</span><span>Architecture · Vite ↔ Webpack</span></div>
+    <div class="case-eyebrow rv"><span>Architecture · Vite ↔ Webpack</span></div>
     <h2 class="rv">이종 번들러 Module Federation — 도입했고, 데이터로 뒤집었다</h2>
     <p class="case-thesis rv">"전체를 마이그레이션해야 한다"는 전제를 POC 하나로 반박하고 1년 6개월 프로덕션 운영.</p>
     <dl>
@@ -351,7 +382,7 @@ if (!new RegExp(`\\b${local}\\b`).test(chunk)) dropImportStatement()</code></pre
   </section>
 
   <section class="case">
-    <div class="case-eyebrow rv"><span class="idx">03</span><span>Performance · CI Pipeline</span></div>
+    <div class="case-eyebrow rv"><span>Performance · CI Pipeline</span></div>
     <h2 class="rv">CI 636초 → 158초 — 채택한 조치만큼 철회한 조치가 산출물</h2>
     <p class="case-thesis rv">잡을 빠르게 만드는 것과 파이프라인을 빠르게 만드는 것은 다른 문제였다.</p>
     <dl>
@@ -400,7 +431,7 @@ if (!new RegExp(`\\b${local}\\b`).test(chunk)) dropImportStatement()</code></pre
   </section>
 
   <section class="case">
-    <div class="case-eyebrow rv"><span class="idx">04</span><span>Test Infrastructure · Compiler Plugin</span></div>
+    <div class="case-eyebrow rv"><span>Test Infrastructure · Compiler Plugin</span></div>
     <h2 class="rv">E2E 식별자 자동 부여 — 가장 자신 있던 결론을 스스로 반증했다</h2>
     <p class="case-thesis rv">이미 발행한 문서를 정정하고 주입 축을 컴파일 타임으로 재설계.</p>
     <dl>
@@ -449,7 +480,7 @@ if (!new RegExp(`\\b${local}\\b`).test(chunk)) dropImportStatement()</code></pre
   </section>
 
   <section class="case">
-    <div class="case-eyebrow rv"><span class="idx">05</span><span>Selected Work</span></div>
+    <div class="case-eyebrow rv"><span>Selected Work</span></div>
     <h2 class="rv">그 밖의 작업</h2>
     <ul class="misc rv">
       <li><strong>접근 제어(RBAC) 개편 — 설계 선행으로 무음 데이터 손실 차단.</strong> 코드 작성 전 기존 구현 전량 분석과 기획 대조로 요구사항의 논리 모순 4건을 해소하고, 저장 시 권한이 조용히 소실되는 경로 3종을 pass-through 설계로 차단. 프론트 설계 변경으로 백엔드 협의 항목 <span class="m">6건 → 3건</span></li>
@@ -469,7 +500,6 @@ if (!new RegExp(`\\b${local}\\b`).test(chunk)) dropImportStatement()</code></pre
   </footer>
 </div>
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
