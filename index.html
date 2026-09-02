@@ -194,12 +194,12 @@
      발광 테두리가 아니라 요소 뒤 주변광 — accent(#f0a742) 유래 */
   details.deep summary::after {
     content: ""; position: absolute; z-index: -1; pointer-events: none;
-    left: -30px; top: 50%; width: 320px; height: 130px;
-    transform: translateY(-50%);
-    background: radial-gradient(closest-side,
-      rgba(240, 167, 66, 0.22),
-      rgba(240, 167, 66, 0.07) 52%,
-      transparent 76%);
+    inset: -22px auto -22px -46px;
+    width: 356px;
+    background: radial-gradient(ellipse farthest-side at 50% 50%,
+      rgba(240, 167, 66, 0.20),
+      rgba(240, 167, 66, 0.075) 52%,
+      transparent 100%);
     opacity: 0;
     transition: opacity .6s ease;
   }
@@ -292,6 +292,7 @@
     dt:first-of-type { padding-top: 0; }
     .hero-cta a { flex: 1 1 auto; text-align: center; }
     .contact span { width: auto; margin-right: 10px; }
+    details.deep summary::after { inset: -18px auto -18px 2px; width: 300px; }
   }
 
   /* ---------- motion ---------- */
