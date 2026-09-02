@@ -187,17 +187,27 @@
 
   /* ---------- deep-dive (계층화) ---------- */
   details.deep { margin-top: 28px; border-top: 1px dashed var(--line); }
+  details.deep { padding-top: 18px; }
   details.deep summary {
     cursor: pointer; list-style: none; user-select: none;
-    font-family: var(--mono); font-size: 12.5px;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--faint); padding: 14px 0 10px;
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 13.5px; line-height: 1.4;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--line); border-radius: 3px;
+    padding: 12px 15px;
+    transition: color .12s ease, border-color .12s ease;
   }
   details.deep summary::-webkit-details-marker { display: none; }
-  details.deep summary::before { content: "+"; color: var(--accent); font-weight: 700; margin-right: 10px; }
-  details.deep[open] summary::before { content: "\2013"; }
-  details.deep summary:hover { color: var(--accent); }
-  .deep-body { padding: 4px 0 10px; display: grid; gap: 22px; }
+  details.deep summary::before {
+    content: "+"; color: var(--accent); font-weight: 700;
+    font-size: 15px; line-height: 1; width: 11px; text-align: center;
+  }
+  details.deep[open] summary::before { content: "\2212"; }
+  details.deep summary:hover { color: var(--accent); border-color: var(--accent); }
+  details.deep summary:active { transform: translateY(1px); }
+  details.deep[open] summary { margin-bottom: 6px; }
+  .deep-body { padding: 4px 0 10px; display: grid; gap: 22px; overflow: hidden; }
   .deep-body > *, dl > dd, .metric { min-width: 0; }
   .deep-body h3 {
     font-family: var(--mono); font-size: 12px; font-weight: 500;
@@ -290,6 +300,7 @@
     .footer-label { margin-bottom: 6px; }
     a { border-bottom: none; }
     .case-links a, .tags span { background: none; }
+    details.deep summary { background: none; border: none; padding: 8px 0 4px; font-size: 11.5px; }
     .hero-cta { display: none; }
     pre, .tbl-wrap table, figure, .deep-body > div { break-inside: avoid; }
   }
@@ -646,6 +657,8 @@
     document.querySelectorAll('details.deep').forEach(function (d) {
       d.dataset.wasOpen = d.open ? '1' : '';
       d.open = true;
+      var body = d.querySelector('.deep-body');
+      if (body) { body.style.height = ''; body.style.opacity = ''; }
     });
   });
   window.addEventListener('afterprint', function () {
@@ -669,6 +682,34 @@
       gsap.to(blk.querySelectorAll('.rv'), {
         opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out',
         scrollTrigger: { trigger: blk, start: 'top 78%' }
+      });
+    });
+
+    document.querySelectorAll('details.deep').forEach(function (d) {
+      var summary = d.querySelector('summary');
+      var body = d.querySelector('.deep-body');
+      if (!summary || !body) return;
+      summary.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (gsap.isTweening(body)) return;
+        if (d.open) {
+          gsap.to(body, {
+            height: 0, opacity: 0, duration: 0.28, ease: 'power2.in',
+            onComplete: function () {
+              d.open = false;
+              gsap.set(body, { clearProps: 'height,opacity' });
+            }
+          });
+        } else {
+          d.open = true;
+          gsap.fromTo(body,
+            { height: 0, opacity: 0 },
+            {
+              height: 'auto', opacity: 1, duration: 0.38, ease: 'power2.out',
+              onComplete: function () { gsap.set(body, { clearProps: 'height' }); }
+            }
+          );
+        }
       });
     });
 
