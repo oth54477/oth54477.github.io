@@ -186,27 +186,36 @@
   .contact span { color: var(--faint); display: inline-block; width: 76px; }
 
   /* ---------- deep-dive (계층화) ---------- */
-  details.deep { margin-top: 28px; border-top: 1px dashed var(--line); }
-  details.deep { padding-top: 18px; }
+  details.deep {
+    margin-top: 28px; border-top: 1px dashed var(--line);
+    position: relative;
+  }
+  /* 스크롤이 이 지점에 닿으면 점선 위로 앰버 실선이 자란다 */
+  details.deep::after {
+    content: ""; position: absolute; top: -1px; left: 0;
+    width: 0; height: 1px; background: var(--accent);
+    transition: width .5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  details.deep.in-view::after { width: 64px; }
   details.deep summary {
     cursor: pointer; list-style: none; user-select: none;
-    display: inline-flex; align-items: center; gap: 10px;
-    font-family: var(--mono); font-size: 13.5px; line-height: 1.4;
+    display: flex; align-items: center; gap: 11px;
+    font-family: var(--mono); font-size: 13px; line-height: 1.4;
+    letter-spacing: 0.06em;
     color: var(--muted);
-    background: var(--surface);
-    border: 1px solid var(--line); border-radius: 3px;
-    padding: 12px 15px;
-    transition: color .12s ease, border-color .12s ease;
+    padding: 15px 0 13px;
+    transition: color .25s ease;
   }
   details.deep summary::-webkit-details-marker { display: none; }
   details.deep summary::before {
     content: "+"; color: var(--accent); font-weight: 700;
     font-size: 15px; line-height: 1; width: 11px; text-align: center;
+    transition: transform .25s cubic-bezier(0.16, 1, 0.3, 1);
   }
   details.deep[open] summary::before { content: "\2212"; }
-  details.deep summary:hover { color: var(--accent); border-color: var(--accent); }
-  details.deep summary:active { transform: translateY(1px); }
-  details.deep[open] summary { margin-bottom: 6px; }
+  details.deep.in-view:not([open]) > summary { color: var(--text); }
+  details.deep.in-view:not([open]) > summary::before { transform: scale(1.3); }
+  details.deep summary:hover { color: var(--accent); }
   .deep-body { padding: 4px 0 10px; display: grid; gap: 22px; overflow: hidden; }
   .deep-body > *, dl > dd, .metric { min-width: 0; }
   .deep-body h3 {
@@ -273,6 +282,7 @@
   @media (prefers-reduced-motion: reduce) {
     .rv { opacity: 1 !important; transform: none !important; }
     html { scroll-behavior: auto; }
+    details.deep::after, details.deep summary, details.deep summary::before { transition: none; }
   }
 
   /* ---------- print (⌘P → PDF) ---------- */
@@ -300,7 +310,8 @@
     .footer-label { margin-bottom: 6px; }
     a { border-bottom: none; }
     .case-links a, .tags span { background: none; }
-    details.deep summary { background: none; border: none; padding: 8px 0 4px; font-size: 11.5px; }
+    details.deep summary { padding: 8px 0 4px; font-size: 11.5px; letter-spacing: 0.04em; }
+    details.deep::after { display: none; }
     .hero-cta { display: none; }
     pre, .tbl-wrap table, figure, .deep-body > div { break-inside: avoid; }
   }
@@ -682,6 +693,15 @@
       gsap.to(blk.querySelectorAll('.rv'), {
         opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out',
         scrollTrigger: { trigger: blk, start: 'top 78%' }
+      });
+    });
+
+    document.querySelectorAll('details.deep').forEach(function (d) {
+      ScrollTrigger.create({
+        trigger: d,
+        start: 'top 82%',
+        end: 'bottom 25%',
+        toggleClass: { targets: d, className: 'in-view' }
       });
     });
 
