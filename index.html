@@ -188,15 +188,22 @@
   /* ---------- deep-dive (계층화) ---------- */
   details.deep {
     margin-top: 28px; border-top: 1px dashed var(--line);
-    position: relative;
+    position: relative; isolation: isolate;
   }
-  /* 스크롤이 이 지점에 닿으면 점선 위로 앰버 실선이 자란다 */
-  details.deep::after {
-    content: ""; position: absolute; top: -1px; left: 0;
-    width: 0; height: 1px; background: var(--accent);
-    transition: width .5s cubic-bezier(0.16, 1, 0.3, 1);
+  /* 스크롤이 이 지점에 닿으면 텍스트 주변 공기가 앰버로 밝아진다.
+     발광 테두리가 아니라 요소 뒤 주변광 — accent(#f0a742) 유래 */
+  details.deep summary::after {
+    content: ""; position: absolute; z-index: -1; pointer-events: none;
+    left: -30px; top: 50%; width: 320px; height: 130px;
+    transform: translateY(-50%);
+    background: radial-gradient(closest-side,
+      rgba(240, 167, 66, 0.22),
+      rgba(240, 167, 66, 0.07) 52%,
+      transparent 76%);
+    opacity: 0;
+    transition: opacity .6s ease;
   }
-  details.deep.in-view::after { width: 64px; }
+  details.deep.in-view:not([open]) > summary::after { opacity: 1; }
   details.deep summary {
     cursor: pointer; list-style: none; user-select: none;
     display: flex; align-items: center; gap: 11px;
@@ -210,13 +217,23 @@
   details.deep summary::before {
     content: "+"; color: var(--accent); font-weight: 700;
     font-size: 15px; line-height: 1; width: 11px; text-align: center;
-    transition: transform .25s cubic-bezier(0.16, 1, 0.3, 1);
+    flex: none;
   }
   details.deep[open] summary::before { content: "\2212"; }
   details.deep.in-view:not([open]) > summary { color: var(--text); }
-  details.deep.in-view:not([open]) > summary::before { transform: scale(1.3); }
   details.deep summary:hover { color: var(--accent); }
-  .deep-body { padding: 4px 0 10px; display: grid; gap: 22px; overflow: hidden; }
+  .deep-body { padding: 4px 0 10px; display: grid; gap: 22px; }
+  /* 전개 애니메이션: 지원 브라우저만. 미지원은 즉시 토글로 열화된다 */
+  @supports selector(details::details-content) {
+    details.deep { interpolate-size: allow-keywords; }
+    details.deep::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition: block-size .38s cubic-bezier(0.16, 1, 0.3, 1), content-visibility .38s;
+      transition-behavior: allow-discrete;
+    }
+    details.deep[open]::details-content { block-size: auto; }
+  }
   .deep-body > *, dl > dd, .metric { min-width: 0; }
   .deep-body h3 {
     font-family: var(--mono); font-size: 12px; font-weight: 500;
@@ -282,7 +299,8 @@
   @media (prefers-reduced-motion: reduce) {
     .rv { opacity: 1 !important; transform: none !important; }
     html { scroll-behavior: auto; }
-    details.deep::after, details.deep summary, details.deep summary::before { transition: none; }
+    details.deep summary, details.deep summary::after { transition: none; }
+    details.deep::details-content { transition: none; }
   }
 
   /* ---------- print (⌘P → PDF) ---------- */
@@ -311,7 +329,7 @@
     a { border-bottom: none; }
     .case-links a, .tags span { background: none; }
     details.deep summary { padding: 8px 0 4px; font-size: 11.5px; letter-spacing: 0.04em; }
-    details.deep::after { display: none; }
+    details.deep summary::after { display: none; }
     .hero-cta { display: none; }
     pre, .tbl-wrap table, figure, .deep-body > div { break-inside: avoid; }
   }
@@ -668,8 +686,6 @@
     document.querySelectorAll('details.deep').forEach(function (d) {
       d.dataset.wasOpen = d.open ? '1' : '';
       d.open = true;
-      var body = d.querySelector('.deep-body');
-      if (body) { body.style.height = ''; body.style.opacity = ''; }
     });
   });
   window.addEventListener('afterprint', function () {
@@ -677,6 +693,17 @@
       d.open = d.dataset.wasOpen === '1';
     });
   });
+  // 주변광 하이라이트: 스크럽이 아닌 단순 가시성 상태라 네이티브 관찰자로 충분하다.
+  // details 토글로 문서 높이가 바뀌어도 자동 대응한다.
+  if ('IntersectionObserver' in window) {
+    var glowIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        en.target.classList.toggle('in-view', en.isIntersecting);
+      });
+    }, { rootMargin: '-12% 0px -12% 0px' });
+    document.querySelectorAll('details.deep').forEach(function (d) { glowIO.observe(d); });
+  }
+
   (function () {
     var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced || typeof gsap === 'undefined') {
@@ -693,43 +720,6 @@
       gsap.to(blk.querySelectorAll('.rv'), {
         opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out',
         scrollTrigger: { trigger: blk, start: 'top 78%' }
-      });
-    });
-
-    document.querySelectorAll('details.deep').forEach(function (d) {
-      ScrollTrigger.create({
-        trigger: d,
-        start: 'top 82%',
-        end: 'bottom 25%',
-        toggleClass: { targets: d, className: 'in-view' }
-      });
-    });
-
-    document.querySelectorAll('details.deep').forEach(function (d) {
-      var summary = d.querySelector('summary');
-      var body = d.querySelector('.deep-body');
-      if (!summary || !body) return;
-      summary.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (gsap.isTweening(body)) return;
-        if (d.open) {
-          gsap.to(body, {
-            height: 0, opacity: 0, duration: 0.28, ease: 'power2.in',
-            onComplete: function () {
-              d.open = false;
-              gsap.set(body, { clearProps: 'height,opacity' });
-            }
-          });
-        } else {
-          d.open = true;
-          gsap.fromTo(body,
-            { height: 0, opacity: 0 },
-            {
-              height: 'auto', opacity: 1, duration: 0.38, ease: 'power2.out',
-              onComplete: function () { gsap.set(body, { clearProps: 'height' }); }
-            }
-          );
-        }
       });
     });
 
