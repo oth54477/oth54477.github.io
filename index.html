@@ -63,16 +63,17 @@
   .metrics { padding: 56px 0; border-bottom: 1px solid var(--line); }
   .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
     gap: 28px 20px;
   }
   .metric .num {
     font-family: var(--mono);
-    font-size: clamp(26px, 4vw, 36px);
+    font-size: clamp(25px, 3.6vw, 32px);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     color: var(--text);
     line-height: 1.1;
+    white-space: nowrap;
   }
   .metric .num .unit { font-size: 0.55em; color: var(--muted); font-weight: 500; margin-left: 2px; }
   .metric .num .arrow { color: var(--accent); font-weight: 500; }
@@ -225,8 +226,8 @@
         <div class="label">순환 의존 (−98%)</div>
       </div>
       <div class="metric rv">
-        <div class="num">10<span class="unit">초</span><span class="arrow">→</span>&lt;1<span class="unit">초</span></div>
-        <div class="label">개발 서버 HMR</div>
+        <div class="num"><span class="arrow">−</span><span data-count="1271">1,271</span><span class="unit">줄</span></div>
+        <div class="label">레거시 렌더 경로 제거 — 소비처 21곳 → 단일 경로</div>
       </div>
       <div class="metric rv">
         <div class="num">v1.20.3</div>
@@ -298,7 +299,9 @@ if (!new RegExp(`\\b${local}\\b`).test(chunk)) dropImportStatement()</code></pre
         React Query와 Vue Query가 <span class="m">단일 Query Client</span>를 공유하도록 통합해
         두 프레임워크가 같은 API 캐시를 참조.</dd>
       <dt class="rv">결과</dt>
-      <dd class="rv">HMR <span class="m">10초 → 1초 미만</span>, 서비스 중단 없이 점진적 React 전환 경로 확보.
+      <dd class="rv"><span class="m">전체 재작성 없이 Vite를 쓸 수 있게 된 것</span>이 핵심 결과입니다 — 개발 서버 HMR이
+        10초대에서 1초 미만으로 바뀐 것은 그 덕에 따라온 이득이고, 서비스 중단 없이 점진적 React 전환
+        경로를 확보했습니다.
         6개월 운영 데이터로 런타임 유연성의 비용(파드 4개 상주·월 2~3건 통합 장애)을 정량화해
         <span class="m">빌드 시점 통합(모노레포) 전환을 설계</span> —
         <span class="q">자신이 도입한 아키텍처를 데이터로 부정하는 것도 같은 사이클의 일부다.</span></dd>
@@ -506,7 +509,7 @@ if (!new RegExp(`\\b${local}\\b`).test(chunk)) dropImportStatement()</code></pre
       gsap.fromTo(obj, { v: 0 }, {
         v: end, duration: 1.1, ease: 'power1.out',
         scrollTrigger: { trigger: el, start: 'top 85%' },
-        onUpdate: function () { el.textContent = Math.round(obj.v); }
+        onUpdate: function () { el.textContent = Math.round(obj.v).toLocaleString('ko-KR'); }
       });
     });
   })();
