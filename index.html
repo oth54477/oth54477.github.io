@@ -41,11 +41,39 @@
   }
   a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(240,167,66,.35); }
   a:hover { border-bottom-color: var(--accent); }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+  /* 히어로 앰비언트: 단색 배경이 밋밋한 문제를 푼다. 스크롤을 따라오지 않게 문서 상단 고정 */
+  body::before {
+    content: ""; position: absolute; z-index: 0; pointer-events: none;
+    top: 0; left: 0; right: 0; height: 820px;
+    background: radial-gradient(ellipse 920px 540px at 24% 14%,
+      rgba(240, 167, 66, 0.085),
+      rgba(240, 167, 66, 0.028) 46%,
+      transparent 72%);
+  }
   .col { max-width: 680px; }
 
   /* ---------- hero ---------- */
   header { padding: 88px 0 72px; border-bottom: 1px solid var(--line); }
+  .hero-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 48px; margin-bottom: 30px;
+  }
+  .hero-metrics {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 34px; width: 430px; flex: none;
+  }
+  .hero-metrics .metric .num { font-size: clamp(21px, 2.1vw, 27px); }
+  .hero-metrics .metric .label { font-size: 12px; margin-top: 5px; }
+  @media (max-width: 980px) {
+    .hero-top { flex-direction: column; gap: 30px; }
+    .hero-metrics { width: 100%; }
+  }
+  @media (max-width: 560px) {
+    .hero-metrics { gap: 16px 20px; }
+    .hero-metrics .metric .num { font-size: 21px; }
+    .hero-metrics .metric .label { font-size: 11.5px; line-height: 1.5; }
+  }
   .eyebrow {
     font-family: var(--mono);
     font-size: 12px;
@@ -61,9 +89,13 @@
     margin: 0 0 24px;
     font-weight: 700;
     text-wrap: balance;
-    max-width: 18em;
   }
-  h1 .amber { color: var(--accent); }
+  h1 .amber {
+    color: var(--accent);
+    transition: color .7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* 진입 시 본문색에서 앰버로 차오른다 — 이 페이지의 논지에 시선을 꽂는 지점 */
+  h1.amber-pending .amber { color: var(--text); }
   .hero-sub { color: var(--muted); max-width: 66ch; margin: 0 0 32px; font-size: 17px; }
   .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; }
   .hero-cta a {
@@ -268,6 +300,10 @@
   .tbl-wrap td.fx { color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 500; }
   figure { margin: 0; }
   figure svg { max-width: 100%; height: auto; display: block; color: var(--muted); }
+  @media (max-width: 760px) {
+    figure { overflow-x: auto; }
+    figure svg { min-width: 600px; }
+  }
   figcaption { font-size: 12.5px; color: var(--faint); margin-top: 12px; }
 
   /* ---------- misc list ---------- */
@@ -301,6 +337,8 @@
     .rv { opacity: 1 !important; transform: none !important; }
     html { scroll-behavior: auto; }
     details.deep summary, details.deep summary::after { transition: none; }
+    h1 .amber { transition: none; }
+    h1.amber-pending .amber { color: var(--accent); }
     details.deep::details-content { transition: none; }
   }
 
@@ -314,15 +352,16 @@
     body { font-size: 12.5px; line-height: 1.6; }
     .rv { opacity: 1 !important; transform: none !important; }
     header { padding: 24px 0 28px; }
-    .metrics { padding: 24px 0; }
+    .hero-top { flex-direction: column; gap: 10px; margin-bottom: 12px; }
+    .hero-metrics { width: 100%; grid-template-columns: repeat(4, 1fr); gap: 8px 16px; }
+    .hero-metrics .metric .num { font-size: 15px; }
+    .hero-metrics .metric .label { font-size: 10px; }
+    body::before { display: none; }
     section.case { display: block; padding: 26px 0; break-inside: avoid; }
     .case-aside { position: static; display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
     .case-stat { margin: 0; padding: 0; border-top: none; }
     .case-stat-num, .case-stat-lbl { display: inline; font-size: 12px; margin: 0; }
     .case-stat-lbl { margin-left: 5px; }
-    .metrics-grid { grid-template-columns: 1fr 1fr; gap: 12px 24px; }
-    .metric.lead { grid-row: auto; padding-top: 0; }
-    .metric.lead .num { font-size: 22px; }
     ul.misc { columns: 1; }
     ul.misc li { margin-bottom: 12px; }
     footer { display: block; padding: 26px 0; }
@@ -331,6 +370,8 @@
     .case-links a, .tags span { background: none; }
     details.deep summary { padding: 8px 0 4px; font-size: 11.5px; letter-spacing: 0.04em; }
     details.deep summary::after { display: none; }
+    figure { overflow-x: visible; }
+    figure svg { min-width: 0; }
     .hero-cta { display: none; }
     pre, .tbl-wrap table, figure, .deep-body > div { break-inside: avoid; }
   }
@@ -341,7 +382,27 @@
 
 <div class="wrap">
   <header>
-    <p class="eyebrow rv">Frontend Engineer · Platform &amp; Build Architecture</p>
+    <div class="hero-top">
+      <p class="eyebrow rv">Frontend Engineer · Platform &amp; Build Architecture</p>
+      <div class="hero-metrics rv">
+      <div class="metric">
+        <div class="num"><span data-count="636">636</span><span class="arrow">→</span><span data-count="158">158</span><span class="unit">초</span></div>
+        <div class="label">CI 파이프라인 총시간 (4.0배)</div>
+      </div>
+      <div class="metric">
+        <div class="num"><span data-count="169">169</span><span class="arrow">→</span><span data-count="3">3</span><span class="unit">건</span></div>
+        <div class="label">순환 의존 (−98%)</div>
+      </div>
+      <div class="metric">
+        <div class="num"><span class="arrow">−</span><span data-count="1271">1,271</span><span class="unit">줄</span></div>
+        <div class="label">레거시 렌더 경로 제거 — 소비처 21곳 → 단일 경로</div>
+      </div>
+      <div class="metric">
+        <div class="num">v1.20.3</div>
+        <div class="label">@module-federation/vite upstream PR 머지·릴리스</div>
+      </div>
+      </div>
+    </div>
     <h1 class="rv">기능을 만드는 것과 <span class="amber">동작함을 판정 가능하게</span> 만드는 것은 같은 작업이다.</h1>
     <p class="hero-sub rv">오태훈. 온프레미스 클라우드 관리 플랫폼(B2B 어드민)에서 여러 팀의 프론트엔드 앱을
       하나의 제품으로 묶는 플랫폼 계층을 3년간 담당했습니다. 도구의 오탐과 제 자신의 진단 오류까지
@@ -351,27 +412,6 @@
       <a href="https://github.com/oth54477">GitHub</a>
     </div>
   </header>
-
-  <div class="metrics">
-    <div class="metrics-grid">
-      <div class="metric lead rv">
-        <div class="num"><span data-count="636">636</span><span class="arrow">→</span><span data-count="158">158</span><span class="unit">초</span></div>
-        <div class="label">CI 파이프라인 총시간 (4.0배)</div>
-      </div>
-      <div class="metric rv">
-        <div class="num"><span data-count="169">169</span><span class="arrow">→</span><span data-count="3">3</span><span class="unit">건</span></div>
-        <div class="label">순환 의존 (−98%)</div>
-      </div>
-      <div class="metric rv">
-        <div class="num"><span class="arrow">−</span><span data-count="1271">1,271</span><span class="unit">줄</span></div>
-        <div class="label">레거시 렌더 경로 제거 — 소비처 21곳 → 단일 경로</div>
-      </div>
-      <div class="metric rv">
-        <div class="num">v1.20.3</div>
-        <div class="label">@module-federation/vite upstream PR 머지·릴리스</div>
-      </div>
-    </div>
-  </div>
 
   <section class="case">
     <div class="case-aside rv">
@@ -607,6 +647,51 @@
               <li>이미 발행한 문서를 즉시 정정 발행 — 결론이 틀렸으면 정정 기록을 남기는 것까지가 검증</li>
             </ul>
           </div>
+          <figure>
+            <svg viewBox="0 0 660 372" role="img" aria-label="템플릿 AST 노드에서 라벨 폴백 체인을 순서대로 시도해 업무 의미를 추출하고, 하나라도 맞으면 보증 등급 식별자를 부여하며, 전부 실패하면 미보증 등급으로 수기 보완 큐에 넘기는 구조">
+              <rect x="215" y="8" width="230" height="40" rx="4" fill="none" stroke="currentColor"/>
+              <text x="330" y="33" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor">템플릿 AST 노드</text>
+              <line x1="330" y1="48" x2="330" y2="72" stroke="currentColor" marker-end="url(#ah2)"/>
+
+              <rect x="95" y="76" width="350" height="184" rx="4" fill="none" stroke="currentColor"/>
+              <text x="112" y="98" font-size="10.5" letter-spacing="1.4" fill="currentColor" opacity="0.62">FALLBACK CHAIN</text>
+
+              <text x="116" y="126" font-size="11.5" font-weight="700" style="fill: var(--accent)">1</text>
+              <text x="136" y="126" font-size="11.5" fill="currentColor">i18n 라벨</text>
+              <text x="116" y="152" font-size="11.5" font-weight="700" style="fill: var(--accent)">2</text>
+              <text x="136" y="152" font-size="11.5" fill="currentColor">aria-label</text>
+              <text x="116" y="178" font-size="11.5" font-weight="700" style="fill: var(--accent)">3</text>
+              <text x="136" y="178" font-size="11.5" fill="currentColor">v-model 경로</text>
+              <text x="116" y="204" font-size="11.5" font-weight="700" style="fill: var(--accent)">4</text>
+              <text x="136" y="204" font-size="11.5" fill="currentColor">이벤트 핸들러명</text>
+              <text x="116" y="230" font-size="11.5" font-weight="700" style="fill: var(--accent)">5</text>
+              <text x="136" y="230" font-size="11.5" fill="currentColor">아이콘명</text>
+
+              <line x1="300" y1="122" x2="470" y2="158" stroke="currentColor" opacity="0.4"/>
+              <line x1="300" y1="148" x2="470" y2="158" stroke="currentColor" opacity="0.4"/>
+              <line x1="300" y1="174" x2="470" y2="158" stroke="currentColor" opacity="0.4"/>
+              <line x1="300" y1="200" x2="470" y2="158" stroke="currentColor" opacity="0.4"/>
+              <line x1="300" y1="226" x2="470" y2="158" stroke="currentColor" opacity="0.4"/>
+              <text x="348" y="110" font-size="10.5" fill="currentColor" opacity="0.62">먼저 맞는 것 채택</text>
+
+              <rect x="472" y="132" width="180" height="52" rx="4" fill="none" style="stroke: var(--accent)"/>
+              <text x="562" y="154" text-anchor="middle" font-size="11.5" font-weight="700" fill="currentColor">보증 등급 식별자</text>
+              <text x="562" y="172" text-anchor="middle" font-size="11" style="fill: var(--accent)">도달률 83.2% · 충돌 0건</text>
+
+              <line x1="270" y1="260" x2="270" y2="298" stroke="currentColor" stroke-dasharray="4 4" marker-end="url(#ah2)"/>
+              <text x="284" y="282" font-size="10.5" fill="currentColor" opacity="0.62">전부 실패 (반복 렌더 구간)</text>
+              <rect x="95" y="300" width="350" height="52" rx="4" fill="none" stroke="currentColor" stroke-dasharray="4 4"/>
+              <text x="270" y="322" text-anchor="middle" font-size="11.5" fill="currentColor">미보증 등급으로 표기</text>
+              <text x="270" y="340" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.68">수기 보완 큐로 이관</text>
+
+              <defs>
+                <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+                </marker>
+              </defs>
+            </svg>
+            <figcaption>라벨 폴백 체인 — 9단계 중 본문에 기재한 5단계. 하나라도 업무 의미를 추출하면 보증 등급 식별자를 부여하고, 전부 실패하는 구간은 해결한 척하지 않고 미보증 등급으로 남겨 수기 보완 큐에 넘긴다.</figcaption>
+          </figure>
           <div>
             <h3>설계 장치</h3>
             <ul>
@@ -715,9 +800,15 @@
     }
     gsap.registerPlugin(ScrollTrigger);
 
+    var heroH1 = document.querySelector('h1');
+    if (heroH1) {
+      heroH1.classList.add('amber-pending');
+      gsap.delayedCall(0.9, function () { heroH1.classList.remove('amber-pending'); });
+    }
+
     gsap.to('header .rv', { opacity: 1, y: 0, duration: 0.7, stagger: 0.12, ease: 'power2.out' });
 
-    document.querySelectorAll('.metrics, section.case, footer').forEach(function (blk) {
+    document.querySelectorAll('section.case, footer').forEach(function (blk) {
       gsap.to(blk.querySelectorAll('.rv'), {
         opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out',
         scrollTrigger: { trigger: blk, start: 'top 78%' }
