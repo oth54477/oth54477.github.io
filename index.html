@@ -86,7 +86,7 @@
 
   /* ---------- hero ---------- */
   header {
-    padding: 88px 0 72px; border-bottom: 1px solid var(--line);
+    padding: 88px 0 120px; border-bottom: 1px solid var(--line);
     min-height: 78vh;
     display: flex; flex-direction: column;
   }
@@ -115,15 +115,16 @@
     font-size: 12px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--faint);
     margin: 0 0 20px;
   }
   h1 {
-    font-size: clamp(32px, 5.2vw, 56px);
-    line-height: 1.28;
-    letter-spacing: -0.015em;
+    font-size: clamp(34px, 6.6vw, 78px);
+    line-height: 1.16;
+    letter-spacing: -0.03em;
     margin: 0 0 24px;
-    font-weight: 700;
+    /* 위계는 크기가 만든다. 굵기로 소리치지 않는다 */
+    font-weight: 400;
     text-wrap: balance;
   }
   @supports ((-webkit-background-clip: text) or (background-clip: text)) {
@@ -168,7 +169,7 @@
     white-space: nowrap;
   }
   .metric .num .unit { font-size: 0.55em; color: var(--muted); font-weight: 500; margin-left: 2px; }
-  .metric .num .arrow { color: var(--accent); font-weight: 500; }
+  .metric .num .arrow { color: var(--faint); font-weight: 500; }
   .metric .label { font-size: 13px; color: var(--faint); margin-top: 8px; }
 
   /* ---------- cases ---------- */
@@ -210,10 +211,10 @@
   dl { margin: 0; display: grid; grid-template-columns: 72px 1fr; gap: 14px 20px; }
   dt {
     font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--accent); padding-top: 5px;
+    text-transform: uppercase; color: var(--faint); padding-top: 5px;
   }
   dd { margin: 0; font-size: 15px; color: var(--text); }
-  dd .m { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+  dd .m { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
   dd .q { color: var(--muted); }
   .case-links {
     margin-top: 24px; display: flex; flex-wrap: wrap; gap: 10px;
@@ -285,7 +286,7 @@
   }
   details.deep summary::-webkit-details-marker { display: none; }
   details.deep summary::before {
-    content: "+"; color: var(--accent); font-weight: 700;
+    content: "+"; color: var(--faint); font-weight: 700;
     font-size: 15px; line-height: 1; width: 11px; text-align: center;
     flex: none;
   }
@@ -312,7 +313,8 @@
   }
   .deep-body p, .deep-body li { font-size: 14.5px; color: var(--muted); }
   .deep-body ul { margin: 0; padding-left: 18px; display: grid; gap: 7px; }
-  .deep-body .m, .misc .m { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+  /* 본문 수치는 밝기와 굵기로만 올라온다. 앰버는 검증된 대표 수치에만 남긴다 */
+  .deep-body .m, .misc .m { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
   pre {
     background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
     padding: 16px 18px; overflow-x: auto; margin: 0;
@@ -411,6 +413,9 @@
       background: none;
       -webkit-background-clip: border-box; background-clip: border-box;
       color: var(--text);
+      /* 화면용 clamp(34px, 6.6vw, 78px)를 상속하면 A4에서 52px가 된다.
+         본문 12.5px 문서에 맞게 고정한다 */
+      font-size: 26px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em;
     }
     .case-links a, .tags span { background: none; }
     details.deep summary { padding: 8px 0 4px; font-size: 11.5px; letter-spacing: 0.04em; }
@@ -883,10 +888,20 @@
       links.push({ a: gateway, b: target, cross: true });
     });
 
-    var w = 0, h = 0, dpr = 1;
+    var subEl = header.querySelector('.hero-sub');
+    var w = 0, h = 0, dpr = 1, bandY = 0, band = 0, yScale = 0.115;
     function resize() {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = header.clientWidth; h = header.clientHeight;
+      // 텍스트가 끝나는 지점 아래로만 그린다. h 비율에 고정하면
+      // 제목 길이나 폰트 크기가 바뀔 때마다 본문 위로 올라탄다
+      // offsetTop을 쓴다. getBoundingClientRect는 .rv 진입 애니메이션의
+      // translateY가 반영된 값이라, 애니메이션 전에는 띠가 없다고 오판한다
+      var textBottom = subEl ? subEl.offsetTop + subEl.offsetHeight : h * 0.62;
+      band = h - textBottom;
+      bandY = textBottom + Math.min(band * 0.5, 66);
+      // 띠가 얕아지면 필드도 같이 납작해진다. 고정 배율이면 경계에서 본문을 문다
+      yScale = 0.115 * Math.min(1, band / 130);
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -914,7 +929,7 @@
       var unit = Math.min(w, 1180);
       // 가로로 넓게 / 세로로 얕게. 경계면을 사이에 둔 좌우 구조가
       // 히어로 텍스트 아래 빈 띠 안에서 통째로 읽혀야 의미가 전달된다
-      return { sx: w * 0.5 + x * k * unit * 0.40, sy: h * 0.87 + y * k * unit * 0.19, k: k, z: z };
+      return { sx: w * 0.5 + x * k * unit * 0.40, sy: bandY + y * k * unit * yScale, k: k, z: z };
     }
 
     var t0 = performance.now();
@@ -930,6 +945,7 @@
       var pitch = (py - 0.5) * 0.90 + (pointerSeen ? 0 : Math.sin(t * 0.062) * 0.16);
 
       ctx.clearRect(0, 0, w, h);
+      if (band < 100) return;   // 띠가 얕으면 본문을 가로지른다. 그리지 않는다
       var p = nodes.map(function (n) { return project(n, yaw, pitch); });
       pProj = p;
 
@@ -937,8 +953,8 @@
       ctx.setLineDash([3, 7]);
       ctx.lineWidth = 1;
       for (var g = -2; g <= 2; g++) {
-        var top = project({ x: 0, y: -0.78, z: g * 0.52 }, yaw, pitch);
-        var bot = project({ x: 0, y: 0.78, z: g * 0.52 }, yaw, pitch);
+        var top = project({ x: 0, y: -0.62, z: g * 0.52 }, yaw, pitch);
+        var bot = project({ x: 0, y: 0.62, z: g * 0.52 }, yaw, pitch);
         ctx.strokeStyle = 'rgba(240, 167, 66, ' + (0.30 * top.k).toFixed(3) + ')';
         ctx.beginPath(); ctx.moveTo(top.sx, top.sy); ctx.lineTo(bot.sx, bot.sy); ctx.stroke();
       }
@@ -976,7 +992,7 @@
 
       // 라벨. 색과 배치만으로는 "Host 하나 : Remote 셋"이 읽히지 않는다.
       // 좁은 폭에서는 필드 자체가 눌리므로 생략한다.
-      if (w >= 640) {
+      if (w >= 640 && bandY + 48 <= h - 6) {
         ctx.font = '600 10px "Space Grotesk", ui-sans-serif, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'alphabetic';
@@ -997,7 +1013,7 @@
     }
     function drawLabel(text, x, color) {
       ctx.fillStyle = color;
-      ctx.fillText(text, x, h * 0.965);   // 좌우 같은 baseline이라야 대칭 구조로 읽힌다
+      ctx.fillText(text, x, bandY + 48);   // 좌우 같은 baseline이라야 대칭 구조로 읽힌다
     }
 
     var rafId = null, visible = true;
