@@ -104,21 +104,7 @@
   }
   /* 진입 시 본문색에서 앰버로 차오른다 — 이 페이지의 논지에 시선을 꽂는 지점 */
   h1.amber-pending .amber { color: var(--text); }
-  .hero-sub { color: var(--muted); max-width: 66ch; margin: 0 0 32px; font-size: 17px; }
-  .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; }
-  .hero-cta a {
-    font-family: var(--mono); font-size: 13.5px; line-height: 1;
-    padding: 12px 18px; border-radius: 3px; white-space: nowrap;
-    border: 1px solid var(--line); border-bottom-color: var(--line);
-    background: var(--surface); color: var(--text);
-    transition: transform .12s ease, border-color .12s ease, color .12s ease;
-  }
-  .hero-cta a.primary {
-    background: var(--accent); border-color: var(--accent); color: #17130b; font-weight: 700;
-  }
-  .hero-cta a:hover { border-color: var(--accent); color: var(--accent); }
-  .hero-cta a.primary:hover { color: #17130b; filter: brightness(1.08); }
-  .hero-cta a:active { transform: translateY(1px); }
+  .hero-sub { color: var(--muted); max-width: 66ch; margin: 0; font-size: 17px; }
 
   /* ---------- metrics ---------- */
   .metrics { padding: 64px 0; border-bottom: 1px solid var(--line); }
@@ -342,7 +328,6 @@
     dl { grid-template-columns: 1fr; gap: 6px 0; }
     dt { padding-top: 14px; }
     dt:first-of-type { padding-top: 0; }
-    .hero-cta a { flex: 1 1 auto; text-align: center; }
     .contact span { width: auto; margin-right: 10px; }
     details.deep summary::after { inset: -18px auto -18px 2px; width: 300px; }
   }
@@ -394,7 +379,6 @@
     details.deep summary::after { display: none; }
     figure { overflow-x: visible; }
     figure svg { min-width: 0; }
-    .hero-cta { display: none; }
     pre, .tbl-wrap table, figure, .deep-body > div { break-inside: avoid; }
   }
 </style>
@@ -429,10 +413,6 @@
     <p class="hero-sub rv">오태훈. 온프레미스 클라우드 관리 플랫폼(B2B 어드민)에서 여러 팀의 프론트엔드 앱을
       하나의 제품으로 묶는 플랫폼 계층을 3년간 담당했습니다. 도구의 오탐과 제 자신의 진단 오류까지
       실측으로 검증하고 정정하는 것을 습관으로 삼습니다.</p>
-    <div class="hero-cta rv">
-      <a class="primary" href="mailto:oth5447@naver.com">이메일 보내기</a>
-      <a href="https://github.com/oth54477">GitHub</a>
-    </div>
   </header>
 
   <section class="case">
