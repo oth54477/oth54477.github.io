@@ -15,7 +15,7 @@
     --line: #242c37;
     --text: #e9edf2;
     --muted: #97a1ad;
-    --faint: #6a7480;
+    --faint: #7c8593;
     --accent: #f0a742;
     --accent-dim: rgba(240, 167, 66, 0.14);
     --mono: "Space Grotesk", ui-monospace, "SF Mono", monospace;
@@ -224,6 +224,14 @@
   }
   .contact { font-family: var(--mono); font-size: 14.5px; display: grid; gap: 8px; }
   .contact span { color: var(--faint); display: inline-block; width: 76px; }
+  .contact a {
+    display: inline-block; padding: 3px 0;
+    border-bottom: none;
+    text-decoration: underline;
+    text-decoration-color: rgba(240, 167, 66, .38);
+    text-underline-offset: 4px;
+  }
+  .contact a:hover { text-decoration-color: var(--accent); }
 
   /* ---------- deep-dive (계층화) ---------- */
   details.deep {
@@ -354,7 +362,7 @@
   @media print {
     :root {
       --bg: #ffffff; --surface: #f6f4ef; --line: #d8d4cb;
-      --text: #1c1a16; --muted: #55524b; --faint: #7a766d;
+      --text: #1c1a16; --muted: #55524b; --faint: #736f66;
       --accent: #a15c00; --accent-dim: rgba(161, 92, 0, 0.1);
     }
     body { font-size: 12.5px; line-height: 1.6; }
@@ -375,6 +383,7 @@
     footer { display: block; padding: 26px 0; }
     .footer-label { margin-bottom: 6px; }
     a { border-bottom: none; }
+    .contact a { text-decoration: none; padding: 0; }
     h1 {
       background: none;
       -webkit-background-clip: border-box; background-clip: border-box;
