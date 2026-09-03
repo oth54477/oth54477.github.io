@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"gh api repos/oth54477/oth54477.github.io/pages --jq '{status: .status, url: .html_url, cname: .cname, https: .https_enforced}' 2>&1; echo \\\"---\\\"; gh api repos/oth54477/oth54477.github.io/...",
-  "error": "Exit code 1\n{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/pages/pages#get-a-apiname-pages-site\",\"status\":\"404\"}gh: Not Found (HTTP 404)\n---\n{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/pages/pages#list-apiname-pages-builds\",\"status\":\"404\"}gh: Not Found (HTTP 404)",
-  "timestamp": "2026-09-02T02:17:52.846Z",
-  "retry_count": 1
-}
