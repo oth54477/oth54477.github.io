@@ -42,19 +42,49 @@
   a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(240,167,66,.35); }
   a:hover { border-bottom-color: var(--accent); }
   .wrap { max-width: 1100px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
-  /* 히어로 앰비언트: 단색 배경이 밋밋한 문제를 푼다. 스크롤을 따라오지 않게 문서 상단 고정 */
+  /* 히어로 앰비언트: 단색 배경이 밋밋한 문제를 푼다. 포인터를 따라간다.
+     --mx/--my는 rAF로 갱신되며, 스크립트가 없으면 기본값(24%/14%)에 머문다 */
+  body {
+    --mx: 24%;
+    --my: 14%;
+  }
   body::before {
     content: ""; position: absolute; z-index: 0; pointer-events: none;
     top: 0; left: 0; right: 0; height: 820px;
-    background: radial-gradient(ellipse 920px 540px at 24% 14%,
+    background: radial-gradient(ellipse 920px 540px at var(--mx) var(--my),
       rgba(240, 167, 66, 0.085),
       rgba(240, 167, 66, 0.028) 46%,
       transparent 72%);
   }
+  /* Host <-> Remote 런타임 연결 구조를 3D로 그린 배경.
+     장식이 아니라 이 페이지가 다루는 주제 자체다 */
+  #federation-field {
+    position: absolute; top: 0; bottom: 0; z-index: 0;
+    pointer-events: none;
+    left: 0; width: 100%; height: 100%;
+    -webkit-mask-image: radial-gradient(ellipse 76% 82% at 70% 70%,
+      #000 0%, #000 44%, rgba(0,0,0,.62) 72%, transparent 96%);
+    mask-image: radial-gradient(ellipse 76% 82% at 70% 70%,
+      #000 0%, #000 44%, rgba(0,0,0,.62) 72%, transparent 96%);
+  }
+  @media (max-width: 980px) {
+    /* 모바일은 텍스트가 폭을 다 써서 필드가 피할 공간이 없다. 더 물러난다 */
+    #federation-field { opacity: 0.3; }
+  }
+  header { position: relative; }
+  header > *:not(#federation-field) { position: relative; z-index: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    #federation-field { opacity: 0.55; }
+  }
   .col { max-width: 680px; }
 
   /* ---------- hero ---------- */
-  header { padding: 88px 0 72px; border-bottom: 1px solid var(--line); }
+  header {
+    padding: 88px 0 72px; border-bottom: 1px solid var(--line);
+    min-height: 78vh;
+    display: flex; flex-direction: column;
+  }
+  .hero-sub { margin-bottom: auto; }
   .hero-top {
     display: flex; justify-content: space-between; align-items: baseline;
     gap: 48px; margin-bottom: 30px;
@@ -352,12 +382,14 @@
     }
     body { font-size: 12.5px; line-height: 1.6; }
     .rv { opacity: 1 !important; transform: none !important; }
-    header { padding: 24px 0 28px; }
+    header { padding: 24px 0 28px; min-height: 0; display: block; }
+    .hero-sub { margin-bottom: 0; }
     .hero-top { flex-direction: column; gap: 10px; margin-bottom: 12px; }
     .hero-metrics { width: 100%; grid-template-columns: repeat(4, 1fr); gap: 8px 16px; }
     .hero-metrics .metric .num { font-size: 15px; }
     .hero-metrics .metric .label { font-size: 10px; }
     body::before { display: none; }
+    #federation-field { display: none; }
     section.case { display: block; padding: 26px 0; break-inside: avoid; }
     .case-aside { position: static; display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
     .case-stat { margin: 0; padding: 0; border-top: none; }
@@ -388,6 +420,7 @@
 
 <div class="wrap">
   <header>
+    <canvas id="federation-field" aria-hidden="true"></canvas>
     <div class="hero-top">
       <p class="eyebrow rv">Frontend Engineer · Platform &amp; Build Architecture</p>
       <div class="hero-metrics rv">
@@ -781,6 +814,185 @@
       d.open = d.dataset.wasOpen === '1';
     });
   });
+
+  // Host <-> Remote 런타임 연결을 3D로 그린 히어로 배경.
+  // Three.js를 쓰지 않는다: 필요한 건 원근 투영 하나뿐이고, 150KB를 LCP에 얹을 이유가 없다.
+  (function () {
+    var canvas = document.getElementById('federation-field');
+    var header = canvas && canvas.parentElement;
+    if (!canvas || !header) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 재현 가능한 배치를 위한 고정 시드 난수
+    var seed = 20260903;
+    function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+
+    // 좌: Host 하나. 우: Remote 셋. 경계면(x=0)을 사이에 둔다.
+    var CLUSTERS = [
+      { cx: -1.40, cy: 0.00, cz: 0.00, n: 10, r: 0.58, host: true },
+      { cx:  1.28, cy: 0.58, cz: 0.28, n: 6,  r: 0.34 },
+      { cx:  1.40, cy: -0.12, cz: -0.38, n: 6, r: 0.32 },
+      { cx:  1.22, cy: -0.78, cz: 0.16, n: 6, r: 0.30 }
+    ];
+
+    var nodes = [];
+    CLUSTERS.forEach(function (c, ci) {
+      for (var i = 0; i < c.n; i++) {
+        nodes.push({
+          x: c.cx + (rnd() - 0.5) * c.r * 2,
+          y: c.cy + (rnd() - 0.5) * c.r * 2,
+          z: c.cz + (rnd() - 0.5) * c.r * 2,
+          cluster: ci,
+          host: !!c.host,
+          phase: rnd() * Math.PI * 2
+        });
+      }
+    });
+
+    // 연결: 같은 클러스터 안은 근접 노드끼리, 경계를 넘는 것은 Host 대표 노드에서만
+    var links = [];
+    for (var a = 0; a < nodes.length; a++) {
+      for (var b = a + 1; b < nodes.length; b++) {
+        var na = nodes[a], nb = nodes[b];
+        if (na.cluster !== nb.cluster) continue;
+        var d = Math.hypot(na.x - nb.x, na.y - nb.y, na.z - nb.z);
+        if (d < 0.62) links.push({ a: a, b: b, cross: false });
+      }
+    }
+    var hostIdx = [];
+    nodes.forEach(function (n, i) { if (n.host) hostIdx.push(i); });
+    [1, 2, 3].forEach(function (ci, k) {
+      var targets = [];
+      nodes.forEach(function (n, i) { if (n.cluster === ci) targets.push(i); });
+      for (var t = 0; t < 2; t++) {
+        links.push({
+          a: hostIdx[(k * 3 + t) % hostIdx.length],
+          b: targets[t % targets.length],
+          cross: true
+        });
+      }
+    });
+
+    var w = 0, h = 0, dpr = 1;
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = header.clientWidth; h = header.clientHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    // 포인터: 앰비언트 광원과 3D 회전이 같은 값을 공유한다
+    var pxTarget = 0.24, pyTarget = 0.14, px = 0.24, py = 0.14, pointerSeen = false;
+    function onPointer(e) {
+      var r = header.getBoundingClientRect();
+      pxTarget = Math.min(Math.max((e.clientX - r.left) / Math.max(r.width, 1), -0.4), 1.4);
+      pyTarget = Math.min(Math.max((e.clientY - r.top) / Math.max(r.height, 1), -0.4), 1.4);
+      pointerSeen = true;
+    }
+    if (!reduced && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      window.addEventListener('pointermove', onPointer, { passive: true });
+    }
+
+    var FOV = 3.4, DEPTH = 3.9;
+    function project(n, yaw, pitch) {
+      var x = n.x * Math.cos(yaw) - n.z * Math.sin(yaw);
+      var z = n.x * Math.sin(yaw) + n.z * Math.cos(yaw);
+      var y = n.y * Math.cos(pitch) - z * Math.sin(pitch);
+      z = n.y * Math.sin(pitch) + z * Math.cos(pitch);
+      var k = FOV / (FOV + z + DEPTH);
+      var unit = Math.min(w, 1180);
+      return { sx: w * 0.66 + x * k * unit * 0.26, sy: h * 0.72 + y * k * unit * 0.26, k: k, z: z };
+    }
+
+    var t0 = performance.now();
+    function frame(now) {
+      var t = (now - t0) / 1000;
+      px += (pxTarget - px) * 0.055;
+      py += (pyTarget - py) * 0.055;
+      document.body.style.setProperty('--mx', (px * 100).toFixed(2) + '%');
+      document.body.style.setProperty('--my', (py * 100).toFixed(2) + '%');
+
+      // 포인터가 없으면 아주 느린 자동 회전으로만 살아 있는다
+      var yaw = (px - 0.5) * 0.85 + (pointerSeen ? 0 : Math.sin(t * 0.085) * 0.3);
+      var pitch = (py - 0.5) * 0.44 + (pointerSeen ? 0 : Math.sin(t * 0.062) * 0.1);
+
+      ctx.clearRect(0, 0, w, h);
+      var p = nodes.map(function (n) { return project(n, yaw, pitch); });
+
+      // 경계면: x=0 평면을 세로 점선 몇 줄로만 암시한다
+      ctx.setLineDash([3, 7]);
+      ctx.lineWidth = 1;
+      for (var g = -1; g <= 1; g++) {
+        var top = project({ x: 0, y: -1.25, z: g * 0.62 }, yaw, pitch);
+        var bot = project({ x: 0, y: 1.25, z: g * 0.62 }, yaw, pitch);
+        ctx.strokeStyle = 'rgba(240, 167, 66, ' + (0.17 * top.k).toFixed(3) + ')';
+        ctx.beginPath(); ctx.moveTo(top.sx, top.sy); ctx.lineTo(bot.sx, bot.sy); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      links.forEach(function (l) {
+        var pa = p[l.a], pb = p[l.b];
+        var k = (pa.k + pb.k) / 2;
+        if (l.cross) {
+          // 경계를 넘는 연결에는 신호가 흐른다
+          var flow = (t * 0.34 + l.a * 0.17) % 1;
+          ctx.strokeStyle = 'rgba(240, 167, 66, ' + (0.40 * k).toFixed(3) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(pa.sx, pa.sy); ctx.lineTo(pb.sx, pb.sy); ctx.stroke();
+          var fx = pa.sx + (pb.sx - pa.sx) * flow, fy = pa.sy + (pb.sy - pa.sy) * flow;
+          ctx.fillStyle = 'rgba(240, 167, 66, ' + (0.60 * k).toFixed(3) + ')';
+          ctx.beginPath(); ctx.arc(fx, fy, 1.7 * k, 0, Math.PI * 2); ctx.fill();
+        } else {
+          ctx.strokeStyle = 'rgba(151, 161, 173, ' + (0.17 * k).toFixed(3) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(pa.sx, pa.sy); ctx.lineTo(pb.sx, pb.sy); ctx.stroke();
+        }
+      });
+
+      var order = p.map(function (pt, i) { return i; }).sort(function (i, j) { return p[j].z - p[i].z; });
+      order.forEach(function (i) {
+        var pt = p[i], n = nodes[i];
+        var pulse = 0.86 + Math.sin(t * 0.8 + n.phase) * 0.14;
+        var r = (n.host ? 2.5 : 1.9) * pt.k * pulse;
+        ctx.fillStyle = n.host
+          ? 'rgba(240, 167, 66, ' + (0.80 * pt.k).toFixed(3) + ')'
+          : 'rgba(201, 210, 221, ' + (0.56 * pt.k).toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(pt.sx, pt.sy, Math.max(r, 0.5), 0, Math.PI * 2); ctx.fill();
+      });
+    }
+
+    var rafId = null, visible = true;
+    function loop(now) { frame(now); rafId = requestAnimationFrame(loop); }
+    function start() { if (rafId === null) rafId = requestAnimationFrame(loop); }
+    function stop() { if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; } }
+
+    resize();
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(function () { resize(); if (!visible || reduced) frame(performance.now()); }).observe(header);
+    } else {
+      window.addEventListener('resize', function () { resize(); if (reduced) frame(performance.now()); });
+    }
+
+    if (reduced) {
+      frame(performance.now());   // 정지 화면 한 장만 그린다
+    } else {
+      // 히어로가 화면에서 벗어나면 프레임 낭비를 멈춘다
+      if (typeof IntersectionObserver !== 'undefined') {
+        new IntersectionObserver(function (entries) {
+          visible = entries[0].isIntersecting;
+          if (visible) start(); else stop();
+        }, { rootMargin: '80px' }).observe(header);
+      } else {
+        start();
+      }
+      start();
+    }
+  })();
+
   // 주변광 하이라이트: 스크럽이 아닌 단순 가시성 상태라 네이티브 관찰자로 충분하다.
   // details 토글로 문서 높이가 바뀌어도 자동 대응한다.
   if ('IntersectionObserver' in window) {
