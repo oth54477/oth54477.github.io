@@ -833,9 +833,9 @@
     // 좌: Host 하나. 우: Remote 셋. 경계면(x=0)을 사이에 둔다.
     var CLUSTERS = [
       { cx: -1.40, cy: 0.00, cz: 0.00, n: 10, r: 0.58, host: true },
-      { cx:  1.28, cy: 0.58, cz: 0.28, n: 6,  r: 0.34 },
-      { cx:  1.40, cy: -0.12, cz: -0.38, n: 6, r: 0.32 },
-      { cx:  1.22, cy: -0.78, cz: 0.16, n: 6, r: 0.30 }
+      { cx:  1.28, cy: 0.58, cz: 0.80, n: 6,  r: 0.34 },
+      { cx:  1.40, cy: -0.12, cz: -0.78, n: 6, r: 0.32 },
+      { cx:  1.22, cy: -0.78, cz: 0.18, n: 6, r: 0.30 }
     ];
 
     var nodes = [];
@@ -844,7 +844,7 @@
         nodes.push({
           x: c.cx + (rnd() - 0.5) * c.r * 2,
           y: c.cy + (rnd() - 0.5) * c.r * 2,
-          z: c.cz + (rnd() - 0.5) * c.r * 2,
+          z: c.cz + (rnd() - 0.5) * c.r * 3.0,
           cluster: ci,
           host: !!c.host,
           phase: rnd() * Math.PI * 2
@@ -918,7 +918,7 @@
 
       // 포인터가 없으면 아주 느린 자동 회전으로만 살아 있는다
       var yaw = (px - 0.5) * 0.85 + (pointerSeen ? 0 : Math.sin(t * 0.085) * 0.3);
-      var pitch = (py - 0.5) * 0.44 + (pointerSeen ? 0 : Math.sin(t * 0.062) * 0.1);
+      var pitch = (py - 0.5) * 0.72 + (pointerSeen ? 0 : Math.sin(t * 0.062) * 0.13);
 
       ctx.clearRect(0, 0, w, h);
       var p = nodes.map(function (n) { return project(n, yaw, pitch); });
