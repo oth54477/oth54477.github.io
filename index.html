@@ -62,14 +62,20 @@
     position: absolute; top: 0; bottom: 0; z-index: 0;
     pointer-events: none;
     left: 0; width: 100%; height: 100%;
-    -webkit-mask-image: radial-gradient(ellipse 76% 82% at 70% 70%,
-      #000 0%, #000 44%, rgba(0,0,0,.62) 72%, transparent 96%);
-    mask-image: radial-gradient(ellipse 76% 82% at 70% 70%,
-      #000 0%, #000 44%, rgba(0,0,0,.62) 72%, transparent 96%);
+    --field-mask: radial-gradient(ellipse 98% 42% at 50% 86%,
+      #000 0%, #000 56%, rgba(0,0,0,.6) 82%, transparent 100%);
+    -webkit-mask-image: var(--field-mask);
+    mask-image: var(--field-mask);
   }
   @media (max-width: 980px) {
-    /* 모바일은 텍스트가 폭을 다 써서 필드가 피할 공간이 없다. 더 물러난다 */
-    #federation-field { opacity: 0.3; }
+    /* 필드가 텍스트 뒤를 지나던 시절의 0.3은 과보정이다.
+       이제 텍스트 아래 띠에만 그리므로 이만큼 물러날 이유가 없다 */
+    #federation-field { opacity: 0.62; }
+  }
+  @media (max-width: 640px) {
+    /* 좁은 화면에서는 텍스트 아래 띠가 아예 남지 않아 필드가 본문을 가로지른다.
+       라벨도 생략되는 폭이라 의미 전달이 0이다. 그리면 손해라 끈다 */
+    #federation-field { display: none; }
   }
   header { position: relative; }
   header > *:not(#federation-field) { position: relative; z-index: 1; }
@@ -832,10 +838,10 @@
 
     // 좌: Host 하나. 우: Remote 셋. 경계면(x=0)을 사이에 둔다.
     var CLUSTERS = [
-      { cx: -1.40, cy: 0.00, cz: 0.00, n: 10, r: 0.58, host: true },
-      { cx:  1.28, cy: 0.58, cz: 0.80, n: 6,  r: 0.34 },
-      { cx:  1.40, cy: -0.12, cz: -0.78, n: 6, r: 0.32 },
-      { cx:  1.22, cy: -0.78, cz: 0.18, n: 6, r: 0.30 }
+      { cx: -1.15, cy: 0.00, cz: 0.00, n: 10, r: 0.44, host: true },
+      { cx:  1.02, cy: 0.58, cz: 0.80, n: 6,  r: 0.34 },
+      { cx:  1.10, cy: -0.12, cz: -0.78, n: 6, r: 0.32 },
+      { cx:  0.98, cy: -0.78, cz: 0.18, n: 6, r: 0.30 }
     ];
 
     var nodes = [];
@@ -844,7 +850,7 @@
         nodes.push({
           x: c.cx + (rnd() - 0.5) * c.r * 2,
           y: c.cy + (rnd() - 0.5) * c.r * 2,
-          z: c.cz + (rnd() - 0.5) * c.r * 3.0,
+          z: c.cz + (rnd() - 0.5) * c.r * 2.0,
           cluster: ci,
           host: !!c.host,
           phase: rnd() * Math.PI * 2
@@ -862,18 +868,19 @@
         if (d < 0.62) links.push({ a: a, b: b, cross: false });
       }
     }
-    var hostIdx = [];
-    nodes.forEach(function (n, i) { if (n.host) hostIdx.push(i); });
-    [1, 2, 3].forEach(function (ci, k) {
-      var targets = [];
-      nodes.forEach(function (n, i) { if (n.cluster === ci) targets.push(i); });
-      for (var t = 0; t < 2; t++) {
-        links.push({
-          a: hostIdx[(k * 3 + t) % hostIdx.length],
-          b: targets[t % targets.length],
-          cross: true
-        });
-      }
+    // 경계에 가장 가까운 Host 노드 하나가 진입점이다.
+    // 여러 노드에서 뻗으면 구조가 아니라 사선 다발로 보인다.
+    var gateway = -1;
+    nodes.forEach(function (n, i) {
+      if (n.host && (gateway < 0 || n.x > nodes[gateway].x)) gateway = i;
+    });
+    nodes[gateway].gateway = true;
+    [1, 2, 3].forEach(function (ci) {
+      var target = -1;
+      nodes.forEach(function (n, i) {
+        if (n.cluster === ci && (target < 0 || n.x < nodes[target].x)) target = i;
+      });
+      links.push({ a: gateway, b: target, cross: true });
     });
 
     var w = 0, h = 0, dpr = 1;
@@ -905,7 +912,9 @@
       z = n.y * Math.sin(pitch) + z * Math.cos(pitch);
       var k = FOV / (FOV + z + DEPTH);
       var unit = Math.min(w, 1180);
-      return { sx: w * 0.66 + x * k * unit * 0.26, sy: h * 0.72 + y * k * unit * 0.26, k: k, z: z };
+      // 가로로 넓게 / 세로로 얕게. 경계면을 사이에 둔 좌우 구조가
+      // 히어로 텍스트 아래 빈 띠 안에서 통째로 읽혀야 의미가 전달된다
+      return { sx: w * 0.5 + x * k * unit * 0.40, sy: h * 0.87 + y * k * unit * 0.19, k: k, z: z };
     }
 
     var t0 = performance.now();
@@ -917,19 +926,20 @@
       document.body.style.setProperty('--my', (py * 100).toFixed(2) + '%');
 
       // 포인터가 없으면 아주 느린 자동 회전으로만 살아 있는다
-      var yaw = (px - 0.5) * 0.85 + (pointerSeen ? 0 : Math.sin(t * 0.085) * 0.3);
-      var pitch = (py - 0.5) * 0.72 + (pointerSeen ? 0 : Math.sin(t * 0.062) * 0.13);
+      var yaw = (px - 0.5) * 0.95 + (pointerSeen ? 0 : Math.sin(t * 0.085) * 0.3);
+      var pitch = (py - 0.5) * 0.90 + (pointerSeen ? 0 : Math.sin(t * 0.062) * 0.16);
 
       ctx.clearRect(0, 0, w, h);
       var p = nodes.map(function (n) { return project(n, yaw, pitch); });
+      pProj = p;
 
       // 경계면: x=0 평면을 세로 점선 몇 줄로만 암시한다
       ctx.setLineDash([3, 7]);
       ctx.lineWidth = 1;
-      for (var g = -1; g <= 1; g++) {
-        var top = project({ x: 0, y: -1.25, z: g * 0.62 }, yaw, pitch);
-        var bot = project({ x: 0, y: 1.25, z: g * 0.62 }, yaw, pitch);
-        ctx.strokeStyle = 'rgba(240, 167, 66, ' + (0.17 * top.k).toFixed(3) + ')';
+      for (var g = -2; g <= 2; g++) {
+        var top = project({ x: 0, y: -0.78, z: g * 0.52 }, yaw, pitch);
+        var bot = project({ x: 0, y: 0.78, z: g * 0.52 }, yaw, pitch);
+        ctx.strokeStyle = 'rgba(240, 167, 66, ' + (0.30 * top.k).toFixed(3) + ')';
         ctx.beginPath(); ctx.moveTo(top.sx, top.sy); ctx.lineTo(bot.sx, bot.sy); ctx.stroke();
       }
       ctx.setLineDash([]);
@@ -940,14 +950,14 @@
         if (l.cross) {
           // 경계를 넘는 연결에는 신호가 흐른다
           var flow = (t * 0.34 + l.a * 0.17) % 1;
-          ctx.strokeStyle = 'rgba(240, 167, 66, ' + (0.40 * k).toFixed(3) + ')';
-          ctx.lineWidth = 1;
+          ctx.strokeStyle = 'rgba(240, 167, 66, ' + (0.52 * k).toFixed(3) + ')';
+          ctx.lineWidth = 1.2;
           ctx.beginPath(); ctx.moveTo(pa.sx, pa.sy); ctx.lineTo(pb.sx, pb.sy); ctx.stroke();
           var fx = pa.sx + (pb.sx - pa.sx) * flow, fy = pa.sy + (pb.sy - pa.sy) * flow;
-          ctx.fillStyle = 'rgba(240, 167, 66, ' + (0.60 * k).toFixed(3) + ')';
-          ctx.beginPath(); ctx.arc(fx, fy, 1.7 * k, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = 'rgba(240, 167, 66, ' + (0.78 * k).toFixed(3) + ')';
+          ctx.beginPath(); ctx.arc(fx, fy, 2.1 * k, 0, Math.PI * 2); ctx.fill();
         } else {
-          ctx.strokeStyle = 'rgba(151, 161, 173, ' + (0.17 * k).toFixed(3) + ')';
+          ctx.strokeStyle = 'rgba(151, 161, 173, ' + (0.24 * k).toFixed(3) + ')';
           ctx.lineWidth = 1;
           ctx.beginPath(); ctx.moveTo(pa.sx, pa.sy); ctx.lineTo(pb.sx, pb.sy); ctx.stroke();
         }
@@ -957,12 +967,37 @@
       order.forEach(function (i) {
         var pt = p[i], n = nodes[i];
         var pulse = 0.86 + Math.sin(t * 0.8 + n.phase) * 0.14;
-        var r = (n.host ? 2.5 : 1.9) * pt.k * pulse;
+        var r = (n.gateway ? 4.6 : n.host ? 3.4 : 2.2) * pt.k * pulse;
         ctx.fillStyle = n.host
-          ? 'rgba(240, 167, 66, ' + (0.80 * pt.k).toFixed(3) + ')'
-          : 'rgba(201, 210, 221, ' + (0.56 * pt.k).toFixed(3) + ')';
-        ctx.beginPath(); ctx.arc(pt.sx, pt.sy, Math.max(r, 0.5), 0, Math.PI * 2); ctx.fill();
+          ? 'rgba(240, 167, 66, ' + (0.95 * pt.k).toFixed(3) + ')'
+          : 'rgba(201, 210, 221, ' + (0.70 * pt.k).toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(pt.sx, pt.sy, Math.max(r, 1.1), 0, Math.PI * 2); ctx.fill();
       });
+
+      // 라벨. 색과 배치만으로는 "Host 하나 : Remote 셋"이 읽히지 않는다.
+      // 좁은 폭에서는 필드 자체가 눌리므로 생략한다.
+      if (w >= 640) {
+        ctx.font = '600 10px "Space Grotesk", ui-sans-serif, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        drawLabel('H O S T', centerX(true), 'rgba(240, 167, 66, 0.62)');
+        drawLabel('R E M O T E S', centerX(false), 'rgba(151, 161, 173, 0.52)');
+      }
+    }
+
+    // 한쪽(Host/Remote) 노드들의 투영 중심과 아래 끝을 구한다
+    var pProj = null;
+    function centerX(host) {
+      var sx = 0, n = 0;
+      for (var i = 0; i < pProj.length; i++) {
+        if (nodes[i].host !== host) continue;
+        sx += pProj[i].sx; n++;
+      }
+      return sx / Math.max(n, 1);
+    }
+    function drawLabel(text, x, color) {
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, h * 0.965);   // 좌우 같은 baseline이라야 대칭 구조로 읽힌다
     }
 
     var rafId = null, visible = true;
@@ -985,11 +1020,10 @@
         new IntersectionObserver(function (entries) {
           visible = entries[0].isIntersecting;
           if (visible) start(); else stop();
-        }, { rootMargin: '80px' }).observe(header);
+        }, { rootMargin: '80px' }).observe(canvas);
       } else {
         start();
       }
-      start();
     }
   })();
 
