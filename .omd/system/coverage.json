@@ -45,8 +45,8 @@
       "pass": true
     }
   },
-  "design_md_sha256": "b480314f4748df2021acf7b639b742d9ab612265904732a9854a920b047bbda7",
-  "graph_sha256": "a0b6a5ad3f1d2fb7daeb8f27d32ef772ed1dee2bbad0cb2b3c6c23dd76847654",
+  "design_md_sha256": "a7327a4ec5964a380479049bca8f1a0ffe22cba4aec49181f27716f2e4fe76b8",
+  "graph_sha256": "23b5f494423e9b7c5f7926ce13b8dfb8a2c704fa922714ae769d6ea20b14e529",
   "groups": {
     "components-states": {
       "evidence": [

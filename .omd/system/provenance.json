@@ -205,9 +205,17 @@
       "path": "/governance/priority/0",
       "source_class": "agent-proposed-greenfield-decision",
       "value": "접근성(대비, 포커스 가시성, reduced-motion)은 시각적 선호보다 앞선다"
+    },
+    {
+      "evidence": [
+        "index.html"
+      ],
+      "path": "/layout_platforms/platforms/0/rules/1",
+      "source_class": "repository-fact",
+      "value": "외부 의존성은 Google Fonts 스타일시트뿐이다. 애니메이션 라이브러리를 두지 않고 IntersectionObserver와 CSS 전환으로 진입 리빌과 카운트업을 처리한다"
     }
   ],
-  "design_md_sha256": "b480314f4748df2021acf7b639b742d9ab612265904732a9854a920b047bbda7",
-  "graph_sha256": "a0b6a5ad3f1d2fb7daeb8f27d32ef772ed1dee2bbad0cb2b3c6c23dd76847654",
+  "design_md_sha256": "a7327a4ec5964a380479049bca8f1a0ffe22cba4aec49181f27716f2e4fe76b8",
+  "graph_sha256": "23b5f494423e9b7c5f7926ce13b8dfb8a2c704fa922714ae769d6ea20b14e529",
   "schema_version": "2.0.0"
 }

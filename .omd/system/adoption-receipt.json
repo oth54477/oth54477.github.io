@@ -2,35 +2,35 @@
   "authority": "system-graph",
   "inputs": {
     "coverage_sha256": "2ec7a602f306b1715d0f25b0ecd0219300f8c58394659649b606fe1266dac365",
-    "graph_sha256": "77a2b61d60f535304497f09ccba93e1362ceae8617a517c1fdb7e7a64acb8ccf",
-    "provenance_sha256": "1c81d4d3282823675cd82eee914198d38da6fd6584506f8befab8f5a0ba99f1d"
+    "graph_sha256": "492d2d2edc9d825e6290ac4af9bc54595e4a2bef2a097d40e7f0d6b0fcf62274",
+    "provenance_sha256": "68f0005e3c01cd5c2945a46a263203a2127d64dfd6eeaf903e080d501366e0a9"
   },
   "kind": "design-md-core-adoption-receipt",
   "outputs": {
     "coverage": {
       "path": ".omd/system/coverage.json",
-      "sha256": "add2a8228d0f62b582061a8c72fd47c5164b114743aafb716ad8ecd6c4e36faa"
+      "sha256": "6ba2d0118dd160af28ed8d523e873f9a430e3b700d121b67bb31243d8572509c"
     },
     "design_md": {
       "path": "DESIGN.md",
-      "sha256": "b480314f4748df2021acf7b639b742d9ab612265904732a9854a920b047bbda7"
+      "sha256": "a7327a4ec5964a380479049bca8f1a0ffe22cba4aec49181f27716f2e4fe76b8"
     },
     "graph": {
       "path": ".omd/system/graph.json",
-      "sha256": "a0b6a5ad3f1d2fb7daeb8f27d32ef772ed1dee2bbad0cb2b3c6c23dd76847654"
+      "sha256": "23b5f494423e9b7c5f7926ce13b8dfb8a2c704fa922714ae769d6ea20b14e529"
     },
     "manifest": {
       "path": ".omd/system/manifest.json",
-      "sha256": "9d836392d8448d93afe7efd39727ba55942599287264aabb91e8b10420697905"
+      "sha256": "29f14106b01308edd69e0958b2f41d71969931dae61f9fa30b5d346e25365420"
     },
     "provenance": {
       "path": ".omd/system/provenance.json",
-      "sha256": "93de34efd60c229da03bca0931c27910c966f17533798de9889b79f6a3e7bd52"
+      "sha256": "669ea3d3b461b0e623386bd264f7dde24aecb7aa601814ef73a9baeac228299f"
     }
   },
   "review": {
     "authority_transition_approved": true,
-    "receipt_sha256": "5ac74be2688a3d05bcdf3ef587a82234c4aa21ddfe09161e37ef2f4143fda80d",
+    "receipt_sha256": "5263020473ddc8ab45fada22b01b83befc47bfd377147a56aa6d1cc497d6d367",
     "reviewer": {
       "identifier": "oth54477",
       "role": "project-owner"

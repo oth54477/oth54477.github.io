@@ -375,6 +375,13 @@
 
   /* ---------- motion ---------- */
   .rv { opacity: 0; transform: translateY(14px); }
+  /* 진입 전환. GSAP power2.out은 easeOutCubic이다 */
+  .rv-in {
+    opacity: 1; transform: none;
+    transition:
+      opacity var(--rv-dur, .6s) cubic-bezier(0.215, 0.61, 0.355, 1) var(--rv-delay, 0s),
+      transform var(--rv-dur, .6s) cubic-bezier(0.215, 0.61, 0.355, 1) var(--rv-delay, 0s);
+  }
   @media (prefers-reduced-motion: reduce) {
     .rv { opacity: 1 !important; transform: none !important; }
     html { scroll-behavior: auto; }
@@ -815,8 +822,6 @@
   </footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
   window.addEventListener('beforeprint', function () {
     document.querySelectorAll('details.deep').forEach(function (d) {
@@ -1058,40 +1063,72 @@
     document.querySelectorAll('details.deep').forEach(function (d) { glowIO.observe(d); });
   }
 
+  // 진입 리빌 · 카운트업. GSAP을 걷어내고 IntersectionObserver + CSS 전환으로 처리한다.
+  // ScrollTrigger를 쓰던 두 곳 모두 scrub이 아니라 "트리거가 뷰포트 X%에 닿으면 한 번"이라
+  // rootMargin으로 같은 경계를 만들 수 있다.
   (function () {
     var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced || typeof gsap === 'undefined') {
+    var fmt = function (n) { return n.toLocaleString('ko-KR'); };
+    var counters = document.querySelectorAll('[data-count]');
+
+    function settle() {
       document.querySelectorAll('.rv').forEach(function (el) {
         el.style.opacity = 1; el.style.transform = 'none';
       });
-      return;
+      counters.forEach(function (el) {
+        el.textContent = fmt(parseInt(el.getAttribute('data-count'), 10));
+      });
     }
-    gsap.registerPlugin(ScrollTrigger);
+    if (reduced || !('IntersectionObserver' in window)) { settle(); return; }
 
     var heroH1 = document.querySelector('h1');
     if (heroH1) {
       heroH1.classList.add('amber-pending');
-      gsap.delayedCall(0.9, function () { heroH1.classList.remove('amber-pending'); });
+      setTimeout(function () { heroH1.classList.remove('amber-pending'); }, 900);
     }
 
-    gsap.to('header .rv', { opacity: 1, y: 0, duration: 0.7, stagger: 0.12, ease: 'power2.out' });
-
-    document.querySelectorAll('section.case, footer').forEach(function (blk) {
-      gsap.to(blk.querySelectorAll('.rv'), {
-        opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out',
-        scrollTrigger: { trigger: blk, start: 'top 78%' }
+    function reveal(els, dur, stagger) {
+      els.forEach(function (el, i) {
+        el.style.setProperty('--rv-dur', dur + 's');
+        el.style.setProperty('--rv-delay', (i * stagger) + 's');
+        el.classList.add('rv-in');
       });
+    }
+    var list = function (root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); };
+
+    // 헤더는 스크롤과 무관하게 즉시. 초기 상태가 한 번 그려진 뒤라야 전환이 걸린다
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { reveal(list(document, 'header .rv'), 0.7, 0.12); });
     });
 
-    document.querySelectorAll('[data-count]').forEach(function (el) {
-      var end = parseInt(el.getAttribute('data-count'), 10);
-      var obj = { v: end };
-      gsap.fromTo(obj, { v: 0 }, {
-        v: end, duration: 1.1, ease: 'power1.out',
-        scrollTrigger: { trigger: el, start: 'top 85%' },
-        onUpdate: function () { el.textContent = Math.round(obj.v).toLocaleString('ko-KR'); }
+    // start:'top 78%' == 뷰포트 하단을 22% 깎은 경계
+    var blockIO = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        reveal(list(en.target, '.rv'), 0.6, 0.08);
+        obs.unobserve(en.target);
       });
-    });
+    }, { rootMargin: '0px 0px -22% 0px' });
+    document.querySelectorAll('section.case, footer').forEach(function (b) { blockIO.observe(b); });
+
+    // start:'top 85%' == 하단 15% 깎기. 이징은 GSAP power1.out == easeOutQuad
+    function countUp(el) {
+      var end = parseInt(el.getAttribute('data-count'), 10), t0 = null, D = 1100;
+      function step(now) {
+        if (t0 === null) t0 = now;
+        var t = Math.min((now - t0) / D, 1);
+        el.textContent = fmt(Math.round(end * (1 - (1 - t) * (1 - t))));
+        if (t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    var countIO = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        countUp(en.target); obs.unobserve(en.target);
+      });
+    }, { rootMargin: '0px 0px -15% 0px' });
+    counters.forEach(function (el) { countIO.observe(el); });
   })();
 </script>
 

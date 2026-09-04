@@ -296,7 +296,7 @@ Required.
 ### Platform: web
 
 - 무빌드 단일 HTML. 번들러와 npm 의존성을 추가하지 않는다
-- 외부 라이브러리는 CDN만 사용하며 현재 GSAP과 ScrollTrigger만 로드한다
+- 외부 의존성은 Google Fonts 스타일시트뿐이다. 애니메이션 라이브러리를 두지 않고 IntersectionObserver와 CSS 전환으로 진입 리빌과 카운트업을 처리한다
 - prefers-reduced-motion에서 진입 애니메이션과 전환을 끄고 배경 필드는 정지 프레임 한 장만 그린다
 - 인쇄 시 라이트 팔레트로 교체하고 details를 자동으로 펼쳐 PDF 이력서로 쓴다. 새 섹션을 추가하면 @media print 규칙도 함께 갱신한다
 
@@ -388,3 +388,4 @@ Record, review, and validate changes before adoption.
 - /typography_assets/assets/0/notes — repository-fact; value: "한글 본문과 제목. 600은 측정값 강조 전용으로 요청한다 — 링크에서 빠지면 CSS 폰트 매칭이 700으로 떨어져 강조가 무력화된다"; evidence: Google Fonts 요청에 600을 추가하기 전에는 CSS 폰트 매칭이 700을 선택해 변경이 무효였다(커밋 1b26de2)
 - /governance/change_policy/0 — repository-fact; value: "원본은 포트폴리오/오태훈-포트폴리오.html이며 site/index.html은 재조립 산출물이다. 산출물을 직접 고치지 않는다"; evidence: 두 파일의 차이가 doctype/head/body 래퍼 10줄뿐임을 확인했다
 - /experience/avoid/4 — prompt-fact; value: "빌드 스텝이나 번들러를 요구하는 의존성 추가"; evidence: 소유자의 th-oh-design 스킬이 무빌드 단일 HTML과 CDN 전용을 하드 제약으로 규정한다
+- /layout_platforms/platforms/0/rules/1 — repository-fact; value: "외부 의존성은 Google Fonts 스타일시트뿐이다. 애니메이션 라이브러리를 두지 않고 IntersectionObserver와 CSS 전환으로 진입 리빌과 카운트업을 처리한다"; evidence: GSAP과 ScrollTrigger CDN 2건을 제거하고 IntersectionObserver + CSS 전환으로 대체했다. scrub 사용처가 없어 rootMargin으로 같은 트리거 경계를 만들 수 있었다
