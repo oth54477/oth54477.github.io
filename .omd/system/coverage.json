@@ -1,0 +1,95 @@
+{
+  "checks": {
+    "assets_fonts_licenses": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "bound_system_authority": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "component_state_coverage": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "contrast": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "implementation_contract_complete": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "opaque_extension_preservation": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "portable_core_structure": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "reduced_motion": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "responsive_320_200": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "token_reference_closure": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    },
+    "unknown_absence": {
+      "method": "controller-computed-system-graph-v2",
+      "pass": true
+    }
+  },
+  "design_md_sha256": "b480314f4748df2021acf7b639b742d9ab612265904732a9854a920b047bbda7",
+  "graph_sha256": "a0b6a5ad3f1d2fb7daeb8f27d32ef772ed1dee2bbad0cb2b3c6c23dd76847654",
+  "groups": {
+    "components-states": {
+      "evidence": [
+        "index.html"
+      ],
+      "status": "covered"
+    },
+    "content-locales": {
+      "evidence": [
+        "index.html"
+      ],
+      "status": "covered"
+    },
+    "experience": {
+      "evidence": [
+        "index.html"
+      ],
+      "status": "covered"
+    },
+    "foundations": {
+      "evidence": [
+        "index.html"
+      ],
+      "status": "covered"
+    },
+    "governance": {
+      "evidence": [
+        "index.html"
+      ],
+      "status": "covered"
+    },
+    "layout-platforms": {
+      "evidence": [
+        "index.html"
+      ],
+      "status": "covered"
+    },
+    "typography-assets": {
+      "evidence": [
+        "index.html"
+      ],
+      "status": "covered"
+    }
+  },
+  "schema_version": "2.0.0"
+}
