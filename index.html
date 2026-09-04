@@ -203,9 +203,10 @@
     color: var(--faint); margin: 0;
   }
   h2 {
-    font-size: clamp(23px, 2.7vw, 34px);
-    line-height: 1.38; letter-spacing: -0.012em;
-    margin: 0 0 12px; font-weight: 700; text-wrap: balance;
+    font-size: clamp(26px, 3.4vw, 42px);
+    line-height: 1.25; letter-spacing: -0.022em;
+    /* h1과 같은 원리. 위계는 크기가 만든다 */
+    margin: 0 0 12px; font-weight: 400; text-wrap: balance;
   }
   .case-thesis { color: var(--muted); font-size: 15px; margin: 0 0 28px; max-width: 60ch; }
   dl { margin: 0; display: grid; grid-template-columns: 72px 1fr; gap: 14px 20px; }
@@ -417,6 +418,7 @@
          본문 12.5px 문서에 맞게 고정한다 */
       font-size: 26px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em;
     }
+    h2 { font-size: 17px; font-weight: 600; line-height: 1.35; letter-spacing: -0.01em; }
     .case-links a, .tags span { background: none; }
     details.deep summary { padding: 8px 0 4px; font-size: 11.5px; letter-spacing: 0.04em; }
     details.deep summary::after { display: none; }
