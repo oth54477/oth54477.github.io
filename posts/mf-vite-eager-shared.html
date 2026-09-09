@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>빌드는 성공하는데 배포하면 죽어요 — @module-federation/vite의 조용한 결함을 upstream에서 고치기까지 · 오태훈</title>
+<meta name="description" content="eager: true shared를 켠 Module Federation host 앱이 프로덕션 빌드에서만 죽었어요. 원인이 번들러가 아니라 플러그인의 정규식 후처리에 있었고, upstream에 고쳐 넣기까지의 기록이에요.">
+<link rel="canonical" href="https://www.th-oh.site/posts/mf-vite-eager-shared.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="빌드는 성공하는데 배포하면 죽어요 — @module-federation/vite의 조용한 결함을 upstream에서 고치기까지">
+<meta property="og:description" content="eager: true shared를 켠 Module Federation host 앱이 프로덕션 빌드에서만 죽었어요. 원인이 번들러가 아니라 플러그인의 정규식 후처리에 있었고, upstream에 고쳐 넣기까지의 기록이에요.">
+<meta property="og:url" content="https://www.th-oh.site/posts/mf-vite-eager-shared.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --bg: #0e1116;
+    --surface: #151a21;
+    --line: #242c37;
+    --text: #e9edf2;
+    --muted: #97a1ad;
+    --faint: #7c8593;
+    --accent: #f0a742;
+    --accent-dim: rgba(240, 167, 66, 0.14);
+    --mono: "Space Grotesk", ui-monospace, "SF Mono", monospace;
+    --body: "Noto Sans KR", "Inter", -apple-system, "Apple SD Gothic Neo", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    font-variant-numeric: tabular-nums;
+  }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(240,167,66,.35); }
+  a:hover { border-bottom-color: var(--accent); }
+
+  /* ---------- prose column ---------- */
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 28px; }
+  article { padding: 40px 0 56px; }
+
+  /* ---------- back link ---------- */
+  /* 글에서 나가는 유일한 경로. 칩이 아니라 라벨이라 배경과 테두리를 두지 않는다 */
+  .back {
+    display: inline-block;
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.06em;
+    color: var(--muted); border-bottom: none; padding: 4px 0;
+  }
+  .back:hover { color: var(--accent); border-bottom: none; }
+  .back-top { margin-top: 32px; }
+  /* 하단 back link. 경계선은 래퍼가 갖는다 — 앵커에 width 100%를 주면
+     본문 전체 폭이 클릭 타깃이 된다 */
+  .back-foot { padding: 28px 0 64px; border-top: 1px solid var(--line); }
+
+  /* ---------- type ---------- */
+  h1 {
+    margin: 26px 0 0;
+    font-size: clamp(28px, 4.5vw, 44px); font-weight: 400;
+    line-height: 1.24; letter-spacing: -0.022em;
+  }
+  h1 code { font-size: 0.82em; background: none; padding: 0; overflow-wrap: anywhere; }
+  h2 {
+    margin: 64px 0 20px;
+    font-size: clamp(22px, 3vw, 30px); font-weight: 400;
+    line-height: 1.3; letter-spacing: -0.018em;
+  }
+  .byline {
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.06em;
+    color: var(--faint); margin: 18px 0 0;
+    padding-bottom: 30px; border-bottom: 1px solid var(--line);
+  }
+  .lede { margin-top: 34px; }
+  p { margin: 0 0 20px; }
+  strong { font-weight: 600; }
+
+  /* ---------- lists ---------- */
+  ol.conds { margin: 0 0 20px; padding-left: 22px; display: grid; gap: 8px; }
+  ol.conds li { padding-left: 4px; }
+  ul.links { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+  ul.links li { font-size: 15px; }
+
+  /* ---------- code ---------- */
+  pre {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+    padding: 16px 18px; overflow-x: auto; margin: 0 0 24px;
+    font-size: 12.5px; line-height: 1.65;
+  }
+  pre, pre code { word-break: normal; overflow-wrap: normal; }
+  pre code { font-family: ui-monospace, "SF Mono", Menlo, monospace; background: none; padding: 0; }
+  pre .c { color: var(--faint); }
+  /* diff. 색으로 소리치지 않는다 — 지운 줄은 물러난 색, 남긴 줄은 본문 색이다 */
+  pre .del { color: var(--faint); }
+  pre .ins { color: var(--text); }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.88em; background: var(--surface);
+    padding: 1px 6px; border-radius: 3px;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------- table ---------- */
+  .tbl-wrap { overflow-x: auto; margin: 0 0 24px; }
+  .tbl-wrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; line-height: 1.55; }
+  .tbl-wrap th {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--faint); text-align: left;
+  }
+  .tbl-wrap th, .tbl-wrap td { padding: 9px 16px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .tbl-wrap td { color: var(--muted); }
+  .tbl-wrap td.fx { color: var(--text); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h2 { margin-top: 52px; }
+  }
+
+  /* ---------- print (⌘P → PDF) ---------- */
+  @media print {
+    :root {
+      --bg: #ffffff; --surface: #f6f4ef; --line: #d8d4cb;
+      --text: #1c1a16; --muted: #55524b; --faint: #736f66;
+      --accent: #a15c00; --accent-dim: rgba(161, 92, 0, 0.1);
+    }
+    body { font-size: 12.5px; line-height: 1.6; }
+    article { padding: 0 0 8px; }
+    /* 종이에서는 돌아갈 곳이 없다 */
+    .back { display: none; }
+    .back-foot { display: none; }
+    a { border-bottom: none; }
+    /* 화면용 clamp는 인쇄에서 vw가 A4 폭으로 재해석된다. 고정 px로 다시 선언한다 */
+    h1 { font-size: 26px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; margin-top: 0; }
+    h2 { font-size: 17px; font-weight: 600; line-height: 1.35; letter-spacing: -0.01em; margin: 22px 0 10px; }
+    .byline { padding-bottom: 14px; }
+    .lede { margin-top: 16px; }
+    /* 본문 링크는 라벨만 남긴다. 링크 섹션만 예외로 주소를 노출해
+       PDF만 받은 사람에게 검증 경로가 남게 한다 */
+    p a::after { content: none; }
+    ul.links a::after {
+      content: " " attr(href);
+      font-size: 9.5px; color: var(--faint); word-break: break-all;
+    }
+    pre { padding: 10px 12px; font-size: 10.5px; border: 1px solid var(--line); }
+    pre, .tbl-wrap table { break-inside: avoid; }
+    h2 { break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a class="back back-top" href="/">← th-oh.site</a>
+
+  <article>
+    <h1>빌드는 성공하는데 배포하면 죽어요 — <code>@module-federation/vite</code>의 조용한 결함을 upstream에서 고치기까지</h1>
+    <p class="byline">오태훈 · 2026-08-05 · 플랫폼 · 빌드 계층</p>
+
+    <p class="lede">안녕하세요. 프론트엔드 엔지니어 오태훈이에요. 플랫폼과 빌드 계층을 맡고 있어요.</p>
+
+    <p><code>eager: true</code> shared를 켠 Module Federation host 앱이 프로덕션 빌드에서만 죽었어요. 원인이 번들러가 아니라 플러그인의 정규식 후처리에 있었고, upstream에 고쳐 넣기까지의 기록이에요.</p>
+
+    <h2>초록불 빌드, 죽는 앱</h2>
+
+    <p>프로덕션 Vue host 앱을 배포하면 화면이 하나도 뜨지 않고 콘솔에 이것만 남았어요.</p>
+
+<pre><code>ReferenceError: __mfLocalSharedImportMap is not defined
+    at getLocalSharedImportMap (http://localhost:5199/remoteEntry.js:215:5)
+    at Module.init (http://localhost:5199/remoteEntry.js:361:45)
+    at http://localhost:5199/assets/hostInit-CM6Ia1xK.js:86:45
+    at async http://localhost:5199/assets/mf-entry-bootstrap-0-1989a01d.js:32:3</code></pre>
+
+    <p><code>hostInit</code>에서 <code>Module.init</code>으로 들어가는 경로라 앱이 부팅 도중에 멈춰요.</p>
+
+    <p><code>minify: false</code>로 다시 빌드해 <code>remoteEntry.js</code>를 열어보니 이유가 보였어요. 식별자를 쓰는 문장은 남아 있는데, 그 식별자를 바인딩하는 import가 없었어요.</p>
+
+<pre><code class="language-js">import { _ as __vitePreload } from './assets/preload-helper-CWZBUsdZ.js';
+import { h as helpers, i as init$1 } from './assets/index-GcC7LmTc.js';
+...
+async function getLocalSharedImportMap() {
+    return __mfLocalSharedImportMap;   <span class="c">// free, undeclared identifier</span>
+}</code></pre>
+
+    <p>CI가 못 잡는 이유도 여기 있어요. <code>vite build</code>는 EXIT 0으로 끝나고 Rollup 경고도 없어요. dev 서버에서는 안 나타나고 프로덕션 빌드에서만 생겨요. 게다가 선언이 사라진 <code>__mfLocalSharedImportMap</code>은 undeclared 전역이 되고, minifier는 선언되지 않은 식별자를 rename하지 못해요. 그래서 minify된 번들에도 이름이 그대로 남아, 산출물만 훑으면 평범한 코드처럼 보여요.</p>
+
+    <h2>재현을 파일 6개로 줄이기</h2>
+
+    <p>사내 코드를 공개할 수 없어 별도 최소 프로젝트로 옮겨야 했어요. 그런데 처음 만든 합성 재현은 멀쩡하게 빌드됐어요. 같은 플러그인, 같은 <code>shared</code> 설정인데 터지지 않았어요.</p>
+
+    <p>차이는 청크 토폴로지였어요. MF 런타임이 별도 shared 청크로 hoist되면 네임스페이스가 청크 경계를 넘고, 그때만 문제의 모양이 나와요. 런타임이 같은 청크에 남으면 바인딩이 <code>{ h, i, _ }</code>처럼 다른 specifier와 함께 렌더링돼서 살아남아요.</p>
+
+    <p>그래서 조건을 하나씩 분리해 필요조건 세 개로 정리했어요.</p>
+
+    <ol class="conds">
+      <li><code>eager: true</code>인 <code>shared</code> 항목이 최소 하나</li>
+      <li>build entry가 둘 이상 (<code>build.rollupOptions.input</code>)</li>
+      <li>앱 소스가 <code>@module-federation/runtime</code>을 직접 import</li>
+    </ol>
+
+    <p>셋 중 하나만 빼도 빌드가 정상으로 돌아와요. 이 조건들은 결함의 원인이 아니라 런타임을 별도 청크로 밀어내는 장치일 뿐이에요. 이렇게 좁히니 파일 여섯 개짜리 프로젝트로 브라우저 런타임 오류까지 재현됐어요.</p>
+
+    <p>확인은 브라우저 없이도 되게 만들어 뒀어요.</p>
+
+<pre><code class="language-bash">node -e '
+const s = require("fs").readFileSync("dist/remoteEntry.js", "utf8");
+console.log("uses the identifier :", s.includes("__mfLocalSharedImportMap"));
+console.log("imports it          :", /import\s*\*\s*as\s*__mfLocalSharedImportMap/.test(s));
+console.log("references the chunk:", s.includes("localSharedImportMap"));
+'
+<span class="c"># broken -&gt; true / false / false</span>
+<span class="c"># fine   -&gt; true / true  / true</span></code></pre>
+
+    <p>영향 범위는 다섯 버전에 걸쳐 매트릭스로 확정했어요.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th><code>@module-federation/vite</code></th><th>결과</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="fx">1.16.1</td><td>영향 없음 (<code>hasEagerShared</code> 코드 경로 자체가 없음)</td></tr>
+          <tr><td class="fx">1.17.0</td><td>재현</td></tr>
+          <tr><td class="fx">1.19.0</td><td>재현</td></tr>
+          <tr><td class="fx">1.20.0</td><td>재현</td></tr>
+          <tr><td class="fx">1.20.2</td><td>재현</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>사내 코드 주석에는 "1.16.1부터"로 적혀 있었어요. 실측해보니 <code>hasEagerShared</code>가 들어온 1.17.0부터였고, 그 부분을 정정했어요.</p>
+
+    <h2>범인은 Rollup이 아니었어요</h2>
+
+    <p>이슈를 올린 시점의 제 가설은 코드 생성부였어요. <code>generateRemoteEntry()</code>가 <code>hasEagerShared</code> 게이트로 import 문과 return 문을 따로 뿌리니까, 그 게이트가 어긋난 거라고 봤어요.</p>
+
+    <p>계속 파보니 아니었어요. Rollup은 import를 정확히 내보냈어요. 지우는 쪽은 플러그인의 후처리, <code>src/utils/controlChunkSanitizer.ts</code>의 <code>stripEmptyPreloadCalls()</code>였어요.</p>
+
+<pre><code class="language-ts">const helperImportRegex = /import\s*\{\s*_\s*as\s*(\w+)\s*\}\s*from\s*["'][^"']+["']\s*;?/g;
+...
+nextCode = nextCode.replace(helperImportRegex, (statement, local) =&gt; {
+  const helperCallRegex = new RegExp(`\\b${local}\\s*\\(`);
+  return helperCallRegex.test(nextCode.replace(statement, '')) ? statement : '';
+});</code></pre>
+
+    <p>의도는 바로 위 empty-deps 재작성 때문에 안 쓰이게 된 Vite preload 헬퍼를 걷어내는 거예요. 문제는 <code>import { _ as x } from '...'</code>가 preload 헬퍼 전용 형태가 아니라는 점이에요. Rollup이 <code>import * as ns from '...'</code>를 청크 경계 밖으로 렌더링할 때도 똑같은 모양이 나와요. 그리고 네임스페이스 바인딩은 호출되지 않고 값으로만 참조돼요. "호출되지 않으니 안 쓰인다"는 판정에 걸려서 삭제돼요.</p>
+
+    <p>단계까지 특정하려고 정규식 콜백에 로그를 심고 빌드를 돌렸어요.</p>
+
+<pre><code>[MF-SANITIZER-DELETED] "import { _ as __mfLocalSharedImportMap } from './assets/_virtual_mf-localSharedImportMap___mfe_internal__hostApp__mf_owner__1-!~{005}~.js';"</code></pre>
+
+    <p>파일명 끝의 <code>!~{005}~</code>가 Rollup의 해시 플레이스홀더예요. 해시가 아직 안 박힌 문자열을 지운다는 건, 이 삭제가 Rollup이 import를 내보낸 다음인 <code>renderChunk</code> 단계에서 일어난다는 뜻이에요.</p>
+
+    <h2>고치는 방법을 한 번 바꿨어요</h2>
+
+    <p>첫 수정안은 모듈 경로 게이트였어요. specifier에 <code>preload-helper</code>가 들어간 경우만 지우는 방식이에요. 크래시는 사라졌는데 기존 테스트 <code>strips minified preload helpers and loadShare side-effect imports</code>가 깨졌어요. 그 테스트에서는 헬퍼가 <code>TreeLoader</code> 청크에서 정당하게 들어와요. Vite는 헬퍼를 임의의 청크에 인라인할 수 있으니, 경로는 애초에 신뢰할 신호가 아니었어요.</p>
+
+    <p>그래서 게이트 대신 판정 기준 자체를 바꿨어요. "호출되는가"에서 "참조되는가"로요.</p>
+
+<pre><code class="language-ts"><span class="del">- const helperCallRegex = new RegExp(`\\b${local}\\s*\\(`);</span>
+<span class="del">- return helperCallRegex.test(nextCode.replace(statement, '')) ? statement : '';</span>
+<span class="ins">+ const helperReferenceRegex = new RegExp(`\\b${local}\\b`);</span>
+<span class="ins">+ return helperReferenceRegex.test(nextCode.replace(statement, '')) ? statement : '';</span></code></pre>
+
+    <p>근거는 실패 모드의 비대칭이에요. 안 쓰는 import를 남기면 몇 바이트를 손해봐요. 쓰는 import를 지우면 빌드는 초록불인 채로 앱이 런타임에 죽어요. 판정은 남기는 쪽으로 기울어야 해요.</p>
+
+    <p>기존 동작도 그대로 보존돼요. 앞선 empty-deps 재작성이 <code>x(()=&gt;import(m),[],import.meta.url)</code>을 <code>import(m)</code>으로 바꿔요. 그래서 empty-deps 호출에만 쓰였던 헬퍼는 남은 참조가 없어 여전히 지워져요.</p>
+
+    <p>메인테이너 대응은 빨랐어요. 이슈 등록 11분 뒤에 확인하겠다는 답이 왔고, 1시간 27분 뒤에 #1013이 머지되면서 이슈가 닫혔어요. #1013은 이 모양을 만들던 eager 분기를 제거해 크래시를 없애요. 그 자체로 좋은 수정이에요. 다만 sanitizer는 그대로라, 값으로만 참조되는 <code>{ _ as x }</code> import가 다른 출처에서 control chunk에 들어오면 같은 손상이 다시 일어날 수 있어요. 그 관계를 이슈 코멘트로 정리하고 PR #1014를 따로 열었어요.</p>
+
+    <h2>검증은 산출물에서</h2>
+
+    <p>회귀 테스트를 하나 추가했어요. <code>_ as __mfLocalSharedImportMap</code>처럼 값으로 참조되는 import는 살아남고, 진짜로 안 쓰이는 preload 헬퍼는 여전히 제거되는지 양방향으로 봐요.</p>
+
+    <p>테스트가 비어있지 않은지부터 확인했어요. fix 없는 main에서 이렇게 실패해요.</p>
+
+<pre><code>FAIL  src/utils/__tests__/controlChunkSanitizer.test.ts &gt; controlChunkSanitizer &gt; keeps `_` imports whose binding is referenced as a value instead of called
+AssertionError: expected 'async function getLocalSharedImportMa…' to contain 'import{_ as __mfLocalSharedImportMap}…'
+      Tests  1 failed | 5 passed (6)</code></pre>
+
+    <p>fix를 얹은 뒤 upstream 전체를 돌렸어요.</p>
+
+<pre><code>pnpm test        -&gt;  Test Files  49 passed (49) / Tests  1017 passed | 1 skipped (1018)
+pnpm fmt.check   -&gt;  All matched files use the correct format.
+pnpm typecheck   -&gt;  clean</code></pre>
+
+    <p>PR은 파일 두 개, 26 additions / 2 deletions로 08:25Z에 열고 08:49Z에 머지됐어요. 약 한 시간 뒤 1.20.3으로 릴리스됐어요. 마지막으로 배포된 tarball의 <code>lib/index.js</code>를 열어 바뀐 판정식이 실제로 들어갔는지 확인했어요.</p>
+
+    <h2>남은 생각</h2>
+
+    <p>"빌드가 성공했다"와 "산출물이 동작한다"는 서로 다른 명제예요. 이번 결함은 그 틈에 들어앉아 있었어요.</p>
+
+    <p>정규식으로 산출물 문자열을 후처리하는 코드에는 AST가 주는 안전망이 없어요. 서로 다른 두 의미가 같은 모양으로 렌더링되면 판정은 조용히 틀려요. 그래서 빌드 타임 코드는 종료 코드가 아니라 산출물 자체를 검증 대상으로 잡아야 해요. 이번에 그 역할을 한 건 <code>remoteEntry.js</code>에 import가 남았는지 보는 node 스니펫 세 줄이었어요.</p>
+
+    <h2>링크</h2>
+
+    <ul class="links">
+      <li><a href="https://github.com/module-federation/vite/issues/1011" target="_blank" rel="noopener">Issue #1011</a></li>
+      <li><a href="https://github.com/module-federation/vite/pull/1014" target="_blank" rel="noopener">PR #1014</a></li>
+      <li><a href="https://github.com/oth54477/mf-vite-eager-shared-repro" target="_blank" rel="noopener">최소 재현 repo</a></li>
+      <li><a href="https://github.com/module-federation/vite/releases/tag/1.20.3" target="_blank" rel="noopener">릴리스 <code>@module-federation/vite</code> 1.20.3 (npm 게시 2026-08-05 09:51Z)</a></li>
+    </ul>
+  </article>
+
+  <div class="back-foot"><a class="back" href="/">← th-oh.site</a></div>
+</div>
+
+</body>
+</html>

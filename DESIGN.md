@@ -228,6 +228,7 @@ Required.
 
 - 모든 칩은 target="_blank" rel="noopener"로 새 탭에서 연다
 - 인쇄에서는 이 행의 칩만 `a::after { content: " " attr(href) }`로 URL을 color.faint 9.5px으로 노출한다. PDF만 받은 사람에게 검증 경로가 남아야 한다. 다른 case-link는 문장 흐름을 깨므로 URL을 노출하지 않는다
+- 같은 사이트 링크는 href가 상대 경로이므로 인쇄에서 `a[href^="/"]::after`로 도메인을 앞에 붙여 절대 URL로 출력한다
 - 근거 URL이 없는 항목은 칩으로 만들지 않는다. 프로필 링크로 대체 표기하지 않는다
 
 ### Component: inline-link
@@ -273,6 +274,33 @@ Required.
 | loading | not-applicable | 내용이 문서에 이미 포함되어 지연 로드가 없다 |
 | error | not-applicable | 실패할 수 있는 동작이 없다 |
 | success | not-applicable | 완료를 보고할 트랜잭션이 없다 |
+
+### Component: back-link
+
+**Semantics:** 글 페이지 상단과 하단에서 루트로 돌아가는 라벨 링크. 칩이 아니라 라벨이므로 배경과 테두리를 두지 않는다
+
+- Anatomy: 화살표, 라벨
+- States: default, hover, focus-visible
+- Token references: font.mono, color.muted, color.accent, color.line, radius.focus
+
+- Interaction kind: interactive
+
+#### State applicability
+
+| State | Applicability | Reason |
+|---|---|---|
+| default | applicable |  |
+| hover | applicable |  |
+| focus-visible | applicable |  |
+| disabled | not-applicable | 정적 문서의 내부 링크로 비활성 상태가 존재하지 않는다 |
+| loading | not-applicable | 비동기 요청 없이 문서 이동만 한다 |
+| error | not-applicable | 클라이언트에서 처리하는 실패 경로가 없다 |
+| success | not-applicable | 완료를 보고할 트랜잭션이 없다 |
+
+#### Rules
+
+- 하단 back link의 1px 상단 경계선은 래퍼가 갖는다. 앵커에 width 100%를 주면 본문 전체 폭이 클릭 타깃이 된다
+- 인쇄에서는 상하 back link를 모두 숨긴다. 종이에는 돌아갈 곳이 없다
 
 ### Component: contact-link
 
@@ -323,6 +351,22 @@ Required.
 - 코드 블록, 다이어그램, 표는 각자 overflow-x: auto 컨테이너 안에서 스크롤한다. 페이지 본문은 가로로 밀리지 않는다
 
 - 640px 미만에서는 히어로 배경 필드를 그리지 않는다 — 텍스트 아래 띠가 남지 않아 본문을 가로지르고 라벨도 생략되어 의미 전달이 0이다
+
+### Layout: post-page
+
+`site/posts/*.html`. 포트폴리오와 같은 토큰·폰트·포커스 규칙을 쓰는 단일 프로즈 페이지다
+
+- 본문은 720px 중앙 정렬에 좌우 layout.gutter 28px. 케이스 2단 그리드를 쓰지 않는다
+
+- 본문 16px/1.75, h1 clamp(28px, 4.5vw, 44px) weight 400 tracking -0.022em, h2 clamp(22px, 3vw, 30px) weight 400
+
+- 코드 블록은 color.surface 바탕에 1px color.line 테두리와 radius.block 4px, 각자 overflow-x: auto로 스크롤한다. 표도 overflow-x: auto 컨테이너에 넣는다. 페이지 본문은 320px에서 가로로 밀리지 않는다
+
+- diff는 색을 새로 만들지 않는다. 지운 줄은 color.faint, 남긴 줄은 color.text로만 구분한다
+
+- 모션과 스크립트가 없다. 애니메이션·IntersectionObserver·카운트업을 두지 않는다
+
+- 인쇄에서는 포트폴리오와 같은 라이트 팔레트로 교체하고, 화면용 clamp 제목을 고정 px로 다시 선언한다. back link는 숨기고 링크 섹션만 `a::after`로 URL을 노출한다
 
 ### Platform: web
 

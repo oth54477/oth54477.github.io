@@ -424,6 +424,11 @@
       content: " " attr(href);
       font-size: 9.5px; color: var(--faint); word-break: break-all;
     }
+    /* 같은 사이트 링크는 href가 상대 경로다. 종이에 "/posts/..."만 남으면
+       주소를 옮겨 적을 수 없으니 도메인을 붙여 절대 URL로 출력한다 */
+    section.case.artifacts .case-links a[href^="/"]::after {
+      content: " https://www.th-oh.site" attr(href);
+    }
     .case-aside { position: static; display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
     .case-stat { margin: 0; padding: 0; border-top: none; }
     .case-stat-num, .case-stat-lbl { display: inline; font-size: 12px; margin: 0; }
@@ -492,6 +497,7 @@
     <div class="case-main">
       <h2 class="rv">공개 산출물</h2>
       <div class="case-links rv">
+        <a href="/posts/mf-vite-eager-shared.html">기술 글 · eager shared 결함 규명기</a>
         <a href="https://github.com/module-federation/vite/pull/1014" target="_blank" rel="noopener">upstream PR #1014</a>
         <a href="https://github.com/module-federation/vite/issues/1011" target="_blank" rel="noopener">Issue #1011</a>
         <a href="https://github.com/oth54477/mf-vite-eager-shared-repro" target="_blank" rel="noopener">최소 재현 repo</a>
@@ -572,6 +578,7 @@
         </div>
       </details>
       <div class="case-links rv">
+        <a href="/posts/mf-vite-eager-shared.html">기술 글</a>
         <a href="https://github.com/module-federation/vite/pull/1014" target="_blank" rel="noopener">PR #1014</a>
         <a href="https://github.com/module-federation/vite/issues/1011" target="_blank" rel="noopener">Issue #1011</a>
         <a href="https://github.com/oth54477/mf-vite-eager-shared-repro" target="_blank" rel="noopener">최소 재현 repo</a>
