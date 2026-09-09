@@ -201,6 +201,35 @@ Required.
 | error | not-applicable | 클라이언트에서 처리하는 실패 경로가 없다 |
 | success | not-applicable | 완료를 보고할 트랜잭션이 없다 |
 
+### Component: artifacts-row
+
+**Semantics:** case-link의 변형. 개별 케이스에 매달리지 않는 공개 산출물(upstream PR, Issue, 최소 재현 저장소, GitHub)을 히어로 직하에 한 줄로 모아 검증 경로를 먼저 제시한다. 칩의 시각 규격은 case-link와 동일하며, 다른 점은 배치와 인쇄 거동뿐이다
+
+- Anatomy: 섹션 eyebrow, h2 접근가능 이름, 링크 칩 목록
+- Variants: PR, Issue, 저장소, 프로필
+- States: default, hover, focus-visible
+- Token references: font.mono, color.surface, color.line, color.muted, color.accent, color.faint, radius.chip
+
+- Interaction kind: interactive
+
+#### State applicability
+
+| State | Applicability | Reason |
+|---|---|---|
+| default | applicable |  |
+| hover | applicable |  |
+| focus-visible | applicable |  |
+| disabled | not-applicable | 정적 문서의 외부 링크로 비활성 상태가 존재하지 않는다 |
+| loading | not-applicable | 비동기 요청 없이 문서 이동만 한다 |
+| error | not-applicable | 클라이언트에서 처리하는 실패 경로가 없다 |
+| success | not-applicable | 완료를 보고할 트랜잭션이 없다 |
+
+#### Rules
+
+- 모든 칩은 target="_blank" rel="noopener"로 새 탭에서 연다
+- 인쇄에서는 이 행의 칩만 `a::after { content: " " attr(href) }`로 URL을 color.faint 9.5px으로 노출한다. PDF만 받은 사람에게 검증 경로가 남아야 한다. 다른 case-link는 문장 흐름을 깨므로 URL을 노출하지 않는다
+- 근거 URL이 없는 항목은 칩으로 만들지 않는다. 프로필 링크로 대체 표기하지 않는다
+
 ### Component: inline-link
 
 **Semantics:** 본문 안 링크. 앰버 글자색과 반투명 앰버 밑줄로 어포던스를 준다
@@ -288,6 +317,8 @@ Required.
 - 본문은 layout.max-width 1100px 중앙 정렬에 좌우 layout.gutter 28px
 
 - 케이스는 232px 라벨단 + 1fr 본문의 2단 그리드이며 좁은 폭에서 단일 단으로 스택된다
+
+- Public Artifacts 행은 히어로 직하, Stack 섹션 앞에 놓는다. 케이스와 같은 2단 그리드를 쓰되 본문이 칩 한 줄뿐이라 상하 여백만 layout.section-gap 88px에서 64px로 줄인다
 
 - 코드 블록, 다이어그램, 표는 각자 overflow-x: auto 컨테이너 안에서 스크롤한다. 페이지 본문은 가로로 밀리지 않는다
 
