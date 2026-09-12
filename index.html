@@ -99,6 +99,7 @@
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px 34px; width: 430px; flex: none;
   }
+  .hero-metrics .metric.wide { grid-column: 1 / -1; }
   .hero-metrics .metric .num { font-size: clamp(21px, 2.1vw, 27px); }
   .hero-metrics .metric .label { font-size: 12px; margin-top: 5px; }
   @media (max-width: 980px) {
@@ -235,7 +236,7 @@
   .cv-role { color: var(--text); font-weight: 600; }
   .cv-meta { color: var(--faint); font-family: var(--mono); font-size: 13px; }
   .cv-note { display: block; color: var(--muted); font-size: 14px; margin-top: 4px; }
-  .cv-item + .cv-item { margin-top: 16px; }
+  .cv-item + .cv-item, .cv-note + .cv-item { margin-top: 16px; }
   .case-links a:hover { color: var(--accent); border-color: var(--accent); }
 
   /* ---------- footer ---------- */
@@ -471,14 +472,18 @@
         <div class="label">CI 파이프라인 총시간 (4.0배)</div>
       </div>
       <div class="metric">
-        <div class="num"><span data-count="169">169</span><span class="arrow">→</span><span data-count="3">3</span><span class="unit">건</span></div>
+        <div class="num"><span data-count="195">195</span><span class="arrow">→</span><span data-count="3">3</span><span class="unit">건</span></div>
         <div class="label">순환 의존 (−98%)</div>
+      </div>
+      <div class="metric">
+        <div class="num"><span data-count="4">4</span><span class="arrow">→</span><span data-count="1">1</span><span class="unit">파드</span></div>
+        <div class="label">통합 빌드 아키텍처 (배포 단위)</div>
       </div>
       <div class="metric">
         <div class="num"><span data-count="2">2</span><span class="arrow">→</span><span data-count="0">0</span><span class="unit">회/일</span></div>
         <div class="label">통합 빌드 전면 차단 (구조적 제거)</div>
       </div>
-      <div class="metric">
+      <div class="metric wide">
         <div class="num">v1.20.3</div>
         <div class="label">@module-federation/vite upstream PR 머지·릴리스</div>
       </div>
@@ -512,20 +517,22 @@
     </div>
     <div class="case-main">
       <h2 class="rv">기술 스택</h2>
-      <p class="case-thesis rv">앱 4 · 공통 패키지 3 · 서브모듈 4 · 원격 저장소 5를 단일 이미지로 통합하는 환경에서 쓰는 것들.</p>
+      <p class="case-thesis rv">앱 4 · 공통 패키지 3 · 서브모듈 5 · 원격 저장소 6을 단일 이미지로 통합하는 환경에서 쓰는 것들.</p>
       <dl>
         <dt class="rv">언어</dt>
         <dd class="tags rv"><span>TypeScript</span><span>JavaScript</span></dd>
         <dt class="rv">프레임워크</dt>
-        <dd class="tags rv"><span>React 18</span><span>Vue 3</span><span>Next.js</span></dd>
+        <dd class="tags rv"><span>React 18</span><span>Vue 3</span></dd>
         <dt class="rv">상태·데이터</dt>
-        <dd class="tags rv"><span>TanStack Query</span><span>Zustand</span><span>Pinia</span></dd>
+        <dd class="tags rv"><span>TanStack Query</span><span>Zustand</span><span>Pinia</span><span>WebSocket</span><span>SSE</span></dd>
         <dt class="rv">빌드</dt>
-        <dd class="tags rv"><span>Vite</span><span>Webpack</span><span>Module Federation</span><span>pnpm</span><span>모노레포</span></dd>
+        <dd class="tags rv"><span>Vite</span><span>Webpack</span><span>esbuild</span><span>Module Federation</span><span>pnpm 모노레포</span></dd>
         <dt class="rv">테스트·품질</dt>
         <dd class="tags rv"><span>Vitest</span><span>Storybook (portable stories)</span><span>SonarQube</span><span>dependency-cruiser</span></dd>
         <dt class="rv">CI·인프라</dt>
-        <dd class="tags rv"><span>GitLab CI</span><span>Jenkins</span><span>Docker</span><span>Kubernetes (on-prem 배포 대상)</span><span>POSIX Shell</span></dd>
+        <dd class="tags rv"><span>GitLab CI</span><span>Jenkins</span><span>Docker</span><span>Kubernetes (on-prem 배포 대상)</span><span>POSIX Shell</span><span>Sentry</span></dd>
+        <dt class="rv">AI 개발 도구</dt>
+        <dd class="tags rv"><span>LLM 게이트웨이 구축·운영</span><span>Ollama (로컬 모델)</span><span>Claude Code</span><span>Codex</span></dd>
       </dl>
     </div>
   </section>
@@ -589,32 +596,40 @@
   <section class="case">
     <div class="case-aside rv">
       <div class="case-eyebrow"><span>Architecture · Vite ↔ Webpack</span></div>
-      <div class="case-stat"><span class="case-stat-num">1년 6개월</span><span class="case-stat-lbl">프로덕션 운영</span></div>
+      <div class="case-stat"><span class="case-stat-num">수십 곳</span><span class="case-stat-lbl">고객사 프로덕션 무장애 가동</span></div>
     </div>
     <div class="case-main">
-      <h2 class="rv">이종 번들러 Module Federation — 도입했고, 데이터로 뒤집었다</h2>
-      <p class="case-thesis rv">"전체를 마이그레이션해야 한다"는 전제를 POC 하나로 반박하고 1년 6개월 프로덕션 운영.</p>
+      <h2 class="rv">이종 번들러 Module Federation — 돌아가던 MFA에 Vite를 붙이고, 운영 데이터로 다시 설계했다</h2>
+      <p class="case-thesis rv">"Vite를 쓰려면 전체를 마이그레이션해야 한다"는 팀 내 전제를 POC 하나로 반박했다.</p>
       <dl>
         <dt class="rv">문제</dt>
-        <dd class="rv">기존 솔루션은 Webpack + Vue 3, 신규 Host는 React + Vite. 전체 마이그레이션
-          비용 때문에 기술 전환 자체가 막혀 있었다.</dd>
+        <dd class="rv">기존 솔루션은 Webpack + Vue 3이고, 팀은 합류 전인 2023년부터 Webpack 내장
+          Module Federation으로 Remote를 운영하고 있었다. 신규 Host는 React + Vite로 만들려 했는데
+          "Vite를 쓰려면 전체를 Vite로 마이그레이션해야 한다"는 전제가 붙어 기술 전환 자체가 막혀 있었다.</dd>
         <dt class="rv">접근</dt>
-        <dd class="rv">Vite(Host) ↔ Webpack(Remote) 런타임 통신을 POC로 먼저 입증하고 프로덕션 규모로 확장.
-          React Query와 Vue Query가 단일 Query Client를 공유하도록 통합해
-          두 프레임워크가 같은 API 캐시를 참조.</dd>
+        <dd class="rv">그 전제를 검증부터 했다 — <code>@module-federation/vite</code>로 Vite(Host) ↔ Webpack(Remote)
+          런타임 통신이 성립함을 POC로 먼저 입증하고 Host 측 Vite MF 도입을 주도했다.
+          React Query와 Vue Query가 <span class="m">단일 Query Client</span>를 공유하도록 통합해
+          두 프레임워크가 같은 API 캐시를 참조한다.
+          이후 타 팀 소유 Remote의 빌드 설정을 webpack 내장 <code>ModuleFederationPlugin</code>에서
+          <code>@module-federation/enhanced</code>(MF 2.0)로 전환하고 런타임을
+          <span class="m">0.21.6 → 2.8.1</span>로 올렸으며, remote 로딩을 <code>remoteEntry.js</code> 직접 참조에서
+          <code>mf-manifest.json</code> 기반으로 이관했다 — manifest의 <code>publicPath</code>가 루트로 내려오는 환경은
+          런타임 플러그인으로 방어하고 remoteEntry 경로는 폴백으로 남겼다.</dd>
         <dt class="rv">결과</dt>
-        <dd class="rv">전체 재작성 없이 Vite를 쓸 수 있게 된 것이 핵심 결과입니다 — 개발 서버 HMR이
-          <span class="m">10초대에서 1초 미만</span>으로 바뀐 것은 그 덕에 따라온 이득이고, 서비스 중단 없이 점진적 React 전환
-          경로를 확보했습니다.
-          6개월 운영 데이터로 런타임 유연성의 비용(<span class="m">파드 4개 상주·월 2~3건</span> 통합 장애)을 정량화해
-          빌드 시점 통합(모노레포) 전환을 설계 —
-          <span class="q">자신이 도입한 아키텍처를 데이터로 부정하는 것도 같은 사이클의 일부다.</span></dd>
+        <dd class="rv">2025년 3월 릴리스 이후 <span class="m">수십 개 고객사 프로덕션에서 장애 없이 가동 중</span>.
+          전체 재작성 없이 신규는 Vite, 기존은 Webpack을 유지하는 점진적 경로를 확보한 것이 핵심 결과이고,
+          이 경로로 이후 Remote 2종이 각 팀 손으로 Vite에 이전했다.
+          개발 서버 HMR이 <span class="m">10초대에서 1초 미만</span>으로 바뀐 것은 그 덕에 따라온 이득이다.
+          이어 6개월 운영 데이터로 런타임 유연성의 비용(<span class="m">파드 4개 상주·월 2~3건</span> 통합 장애)을 정량화해
+          통합 빌드 아키텍처 전환을 설계했다 —
+          <span class="q">자신이 붙인 구조를 데이터로 부정하는 것도 같은 사이클의 일부다.</span></dd>
       </dl>
       <details class="deep rv">
         <summary>자세히 — 구조도와 운영 중 잡은 결함</summary>
         <div class="deep-body">
           <figure>
-            <svg viewBox="0 0 660 330" role="img" aria-label="React와 Vite 기반 Host가 번들러 경계를 넘어 Webpack 기반 Vue Remote 3개를 런타임에 로드하고, 하나의 shared scope와 단일 Query Client를 공유하는 구조">
+            <svg viewBox="0 0 660 330" role="img" aria-label="2025년 3월 도입 시점 구조 — React와 Vite 기반 Host가 번들러 경계를 넘어 Webpack 기반 Vue Remote 3개를 런타임에 로드하고, 하나의 shared scope와 단일 Query Client를 공유한다">
               <defs>
                 <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                   <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
@@ -640,7 +655,8 @@
               <rect x="30" y="260" width="600" height="52" rx="4" fill="none" stroke="currentColor" stroke-dasharray="3 4"/>
               <text x="330" y="291" text-anchor="middle" font-size="11.5" fill="currentColor">shared scope — 단일 TanStack Query Client (React ↔ Vue가 같은 API 캐시 참조)</text>
             </svg>
-            <figcaption>이종 번들러 구조 — Host(Vite·ESM)가 경계 너머의 Webpack Remote 3개를 런타임에 로드하고, 상태는 하나의 shared scope로 공유한다.</figcaption>
+            <figcaption>이종 번들러 구조(2025년 3월 도입 시점) — Host(Vite·ESM)가 경계 너머의 Webpack Remote 3개를 런타임에 로드하고, 상태는 하나의 shared scope로 공유한다.
+              이후 Remote 2종이 각 팀 손으로 Vite에 이전해 현재 Webpack Remote는 1개다 — 경계를 넘는 통신 구조 자체는 그대로다.</figcaption>
           </figure>
           <div>
             <h3>운영 중 잡은 결함</h3>
@@ -652,6 +668,39 @@
           </div>
         </div>
       </details>
+    </div>
+  </section>
+
+  <section class="case">
+    <div class="case-aside rv">
+      <div class="case-eyebrow"><span>Architecture · Build &amp; Deploy</span></div>
+      <div class="case-stat"><span class="case-stat-num">파드 4 → 1</span><span class="case-stat-lbl">배포 단위 통합</span></div>
+    </div>
+    <div class="case-main">
+      <h2 class="rv">통합 빌드 아키텍처 — 파드 4개를 1개로 합치고, 런타임 통합은 남겼다</h2>
+      <p class="case-thesis rv">마이크로 프론트엔드는 배포 빈도가 높은 조직에서 값을 낸다. 저빈도 온프레미스 모델에서는 아니었다.</p>
+      <dl>
+        <dt class="rv">문제</dt>
+        <dd class="rv">런타임 통합만으로 운영한 첫 6개월간 <span class="m">K8s 파드 4개</span> 상주,
+          공통 컴포넌트 <span class="m">4중 중복</span>, 월 <span class="m">2~3건</span> 런타임 통합 장애가 남았다.
+          고객사 데이터센터에 직접 설치되는 제품이라 상주 파드 하나가 그대로 설치·운영 비용이다.</dd>
+        <dt class="rv">판단</dt>
+        <dd class="rv">운영 모니터링 데이터로 그 비용을 정량화해 판정 기준을 <span class="m">배포 빈도</span>로 세웠다 —
+          독립 배포를 실제로 자주 하는 조직이라야 런타임 통합이 값을 낸다.
+          분기 단위로 릴리스하는 온프레미스 모델에서는 통합 빌드가 우수하다는 결론에 도달했고, 사내 표준으로 문서화했다.</dd>
+        <dt class="rv">조치</dt>
+        <dd class="rv">모노레포를 도입해 Remote 3종 + Host를 한 번에 빌드하고 산출물 전부를
+          <span class="m">단일 nginx 이미지</span>에 적재했다. 바뀐 것은 <span class="m">배포 단위</span>뿐이고
+          <span class="m">모듈 통합은 여전히 런타임 Module Federation</span>이다 —
+          각 팀의 저장소와 독립 개발 흐름은 그대로 뒀다.</dd>
+        <dt class="rv">결과</dt>
+        <dd class="rv">앱별 독립 파드 <span class="m">4 → 단일 이미지·파드 1</span>.
+          2026년 6~7월에 구현해 고객사 환경에 배포·운영 중이고, 같은 모노레포를 기반으로
+          솔루션 공통 디자인 시스템을 개발하고 있다.
+          <span class="q">아키텍처는 조직의 배포 빈도에 종속된다 — 유행이 아니라 그게 판정 기준이다.</span></dd>
+        <dt class="rv">스택</dt>
+        <dd class="tags rv"><span>pnpm 모노레포</span><span>Module Federation</span><span>Docker</span><span>Kubernetes</span><span>nginx</span></dd>
+      </dl>
     </div>
   </section>
 
@@ -669,7 +718,7 @@
           <span class="m">하루 2회</span>. 타 팀 브랜치 상태를 사람이 확인하고 배포를 조율하고 있었다.</dd>
         <dt class="rv">접근</dt>
         <dd class="rv">소스 핀으로 결합을 끊었다 — 트리거한 솔루션만 브랜치 최신, 나머지는 마지막 성공 커밋으로 고정.
-          파이프라인 로직을 검증 가능한 POSIX 셸로 분리해 <span class="m">특성화 테스트 61건</span>으로 고정하고,
+          파이프라인 로직을 검증 가능한 POSIX 셸로 분리해 <span class="m">특성화 테스트 65건</span>으로 고정하고,
           커밋 1개로 무력화되는 킬 스위치를 함께 설계해 롤백 MTTR을 줄였다.</dd>
         <dt class="rv">자동화</dt>
         <dd class="rv">실패 사실만 알리던 CI 리포트를, SonarQube Web API로 깨진 품질 게이트 조건과 신규 이슈를
@@ -688,14 +737,14 @@
             <h3>타 팀 변경으로 3일 멈춘 배포</h3>
             <ul>
               <li>타 팀 서브모듈이 트리거한 빌드만 전부 실패했다 — 마지막 성공 커밋 기준 first-parent 이분탐색으로 원인을 특정: 타 팀이 추가한 <code>postinstall</code>이 매니페스트만 복사하는 Docker base 스테이지에서 자기 스크립트를 못 찾고 죽는다</li>
-              <li>증상 경로를 막는 대신 빌드 레이어 전제를 바로잡아 <span class="m">서브모듈 4개</span> 전체의 재발을 차단. "스크립트 디렉터리 복사" 대안은 캐시 무효화를 근거로 기각하고 트레이드오프를 남겼다</li>
+              <li>증상 경로를 막는 대신 빌드 레이어 전제를 바로잡아 <span class="m">당시 서브모듈 4개</span> 전체의 재발을 차단. "스크립트 디렉터리 복사" 대안은 캐시 무효화를 근거로 기각하고 트레이드오프를 남겼다</li>
               <li>사고를 재현하지 못하면 스스로 실패하는 회귀 테스트를 함께 남겨, 검증이 조용히 썩지 않게 설계</li>
             </ul>
           </div>
           <div>
             <h3>사람이 하던 확인을 옮긴 자리</h3>
             <ul>
-              <li><strong>서비스 상태 수동 확인 → 헬스체크.</strong> 호스트 1대·서비스 9개 규모에 맞는 최소 구성(cron + 셸 + 상태 변화 시에만 알림)을 택하고, 정상·실패·접속불가 <span class="m">3경로</span>를 전부 주입 테스트</li>
+              <li><strong>서비스 상태 수동 확인 → 헬스체크.</strong> 호스트 1대·점검 항목 9개 규모에 맞는 최소 구성(cron + 셸 + 상태 변화 시에만 알림)을 택하고, 정상·실패·접속불가 <span class="m">3경로</span>를 전부 주입 테스트</li>
               <li><strong>자기 판정의 철회.</strong> 사내 위키에 직접 게시한 "서비스 자동 기동 미등록" 판정 <span class="m">3건</span>이 조사 방법 결함에 의한 오진임을 스스로 발견해 철회하고, 오진 과정 자체를 재사용 가능한 판정 절차로 남겼다</li>
               <li><strong>subtree 전환으로 끊긴 blame 복구.</strong> 근본 원인을 계보 단절로 규명하고 히스토리 재작성 없이 <code>git replace --graft</code>로 복구 — 원격 저장소 <span class="m">5개</span> 재동기화 비용 없이 코드 소유권 추적성 회복</li>
               <li><strong>ESLint 커스텀 규칙.</strong> 팀 컨벤션을 규칙으로 자동화해 형식적 지적을 리뷰에서 제거</li>
@@ -703,32 +752,6 @@
           </div>
         </div>
       </details>
-    </div>
-  </section>
-
-  <section class="case">
-    <div class="case-aside rv">
-      <div class="case-eyebrow"><span>Developer Experience · Module Federation</span></div>
-      <div class="case-stat"><span class="case-stat-num">3 → 1</span><span class="case-stat-lbl">기동 dev 서버</span></div>
-    </div>
-    <div class="case-main">
-      <h2 class="rv">dev 서버 3개를 1개로 — 인프라도 타 팀 저장소도 건드리지 않고</h2>
-      <p class="case-thesis rv">배포본 매니페스트의 경로 규약을 실측하니 프록시 규칙 하나로 끝나는 문제였다.</p>
-      <dl>
-        <dt class="rv">문제</dt>
-        <dd class="rv">host 1 + remote 3 구조에서 개발자가 매번 dev 서버 <span class="m">3개</span>를 띄워야 했다.
-          16GB 머신에서 RAM 압박이 실제 병목이었다.</dd>
-        <dt class="rv">접근</dt>
-        <dd class="rv">DEV 배포본의 manifest publicPath가 루트 상대경로임을 실측해,
-          Vite dev server 프록시 규칙 하나로 same-origin 로드가 성립함을 입증.
-          전환 토글은 방치돼 있던 localStorage 기반 원격 경로 오버라이드를 재사용해 추가 코드 없이 확보했다.</dd>
-        <dt class="rv">결과</dt>
-        <dd class="rv">기동 dev 서버 <span class="m">3 → 1개</span>, 변경 <span class="m">14파일 +211/−13</span>,
-          인프라·타 팀 저장소 무수정. 별도 리뷰 레인에서 런타임 결함 <span class="m">2건</span>(vue-router 모듈
-          언랩 실패로 폴백 미렌더 · 원격 라우트 미등록)을 배포 전에 검출·수정했다.</dd>
-        <dt class="rv">스택</dt>
-        <dd class="tags rv"><span>Vite</span><span>Module Federation</span><span>vue-router</span></dd>
-      </dl>
     </div>
   </section>
 
@@ -747,7 +770,7 @@
           CPU를 두 배로 늘려도 총시간이 그대로인 원인을 스케줄링(큐잉 76초 + 스테이지 직렬화 82초)으로
           특정해 사장시간 <span class="m">82초 → 3초</span>.</dd>
         <dt class="rv">규율</dt>
-        <dd class="rv">직접 넣은 조치 2건을 실측으로 철회. 절감폭 −68%짜리 안은 "이후 모든 테스트가
+        <dd class="rv">직접 넣은 조치 1건을 실측으로 철회하고, 다른 1건은 산술이 반대임을 확인해 착수 전에 기각. 절감폭 −68%짜리 안은 "이후 모든 테스트가
           실행 순서를 의식해야 하는 영구 부채"라는 이유로 의도적 보류. 대조군 표준편차가 목표 효과를
           압도하자 "측정 불가"를 계산으로 판정하고 중단.
           <span class="q">좋은 수치가 항상 채택 근거는 아니다.</span></dd>
@@ -778,6 +801,7 @@
               <li><strong>pnpm store 이전 — 폐기.</strong> 정적분석은 목표대로 빨라졌지만 테스트 잡이 <span class="m">165 → 241초</span>로 악화 — 매 잡 1,256개 패키지 재다운로드가 디스크를 처닝해 테스트 전 구간을 1.7배 늦춤</li>
               <li><strong>node_modules 캐시 제거 — 착수 전 보류.</strong> restore −6초 대비 install +10~20초로 산술이 반대</li>
               <li><strong>테스트 격리 해제(−68%) — 의도적 보류.</strong> 깨지는 18개 파일의 원인을 모듈 레지스트리 재사용 하나로 수렴시킨 뒤, 비용이 코드가 아니라 이후 모든 테스트가 실행 순서를 의식해야 하는 영구 부채임을 밝힘</li>
+              <li><strong>워커 풀 threads 전환 — 되돌림.</strong> 잡은 빨라졌지만 <code>web-worker</code>가 <code>workerData</code> 존재만으로 자신을 워커로 오판해 로컬은 통과하고 CI만 깨졌다. 원인을 규명한 뒤 격리를 되찾기 위해 forks로 복귀 — 이 파이프라인에서 "로컬 통과·CI 실패"가 나온 두 번째 경로다</li>
               <li><strong>후속 안 CI 검증 — 측정 불가 판정.</strong> 대조군 표준편차 35초가 목표 효과 15초를 압도, 검정력 80%에 한 쪽당 80회 이상 필요함을 계산하고 중단. 대신 분산 자체(같은 잡이 2.3배 흔들림)가 러너 경합이라는 별개 문제임을 분리 기록</li>
             </ul>
           </div>
@@ -789,7 +813,7 @@
   <section class="case">
     <div class="case-aside rv">
       <div class="case-eyebrow"><span>Architecture · Dependency Graph</span></div>
-      <div class="case-stat"><span class="case-stat-num">169 → 3</span><span class="case-stat-lbl">순환 의존</span></div>
+      <div class="case-stat"><span class="case-stat-num">195 → 3</span><span class="case-stat-lbl">순환 의존</span></div>
     </div>
     <div class="case-main">
       <h2 class="rv">리포트를 받아 적지 않고 원본 데이터를 코드와 대조했다</h2>
@@ -805,8 +829,9 @@
           라우터 순환을 끊는 내비게이션 late-binding 서비스를 도입하고, 계층 역전을 해소하고,
           경계 ESLint 규칙이 루트 파일로 새던 우회 구멍을 막았다.</dd>
         <dt class="rv">결과</dt>
-        <dd class="rv">순환 의존 <span class="m">169건 → 3건</span>. 남은 3건은 Module Federation으로 타 팀 앱에
-          노출된 상태 미러 계약이라 의도한 잔여분으로 기록.
+        <dd class="rv">벤더와 동일한 산식 기준으로 순환 의존 <span class="m">195건 → 3건</span>,
+          기술부채비율 <span class="m">3.84% → 3.02%</span>. 남은 3건은 Module Federation으로 타 팀 앱에
+          노출된 상태 미러 계약이라 의도한 잔여분으로 기록했다.
           <span class="q">받은 결론이 아니라 원본 데이터가 판정 근거다.</span></dd>
         <dt class="rv">스택</dt>
         <dd class="tags rv"><span>dependency-cruiser</span><span>SonarQube</span><span>TypeScript AST</span><span>ESLint</span></dd>
@@ -823,11 +848,19 @@
             </ul>
           </div>
           <div>
+            <h3>번들 산출물 실측으로 리팩터를 착수 전에 기각했다</h3>
+            <ul>
+              <li>host 앱의 barrel(<code>index.ts</code>) <span class="m">233개</span> 전면 정리 요구에 대해, tsconfig paths를 해석하는 정적 분석 스크립트로 barrel 경유 import <span class="m">735건</span>을 계량화하고 <span class="m">636건(387파일)</span>을 자동 치환하는 코드모드를 작성해 A/B 빌드를 <span class="m">3회씩</span> 반복 측정</li>
+              <li>결과는 반대였다 — 번들 크기가 오히려 <span class="m">0.07% 증가</span>하고 청크가 <span class="m">169 → 172개</span>로 파편화. Rollup이 ESM 재수출을 이미 tree-shake하므로 barrel 자체는 번들 비용이 아니고, 제거 시 청크 파편화가 Module Federation 환경에서 오히려 손해다</li>
+              <li>실제 비용이 중첩 barrel <span class="m">23개</span>(2홉 이상 import <span class="m">76건</span>의 원인 전부)에 집중됨을 규명해 정리 범위를 <span class="m">233 → 23개</span>로 축소. 코드모드까지 만들어 놓고 데이터를 근거로 쓰지 않는 것도 결과다</li>
+            </ul>
+          </div>
+          <div>
             <h3>벤더 산식을 역산해 다시 측정했다</h3>
             <ul>
               <li>외부 벤더의 기술부채 등급 산식을 리포트 데이터만으로 역산해 TypeScript AST 기반 자체 재측정 파이프라인을 구축</li>
               <li>벤더 리포트가 Vue SFC <span class="m">271개</span>(벤더 등급 리포트 기준, 전체 LOC의 <span class="m">21%</span>)를 누락했음을 입증</li>
-              <li>벤더와 동일한 산식으로 다시 측정한 기준에서 순환참조 <span class="m">195 → 3건</span>, 기술부채비율 <span class="m">3.84% → 3.02%</span>. 앞의 169건은 alias까지 해석한 자체 측정 기준이고, 195건은 벤더 산식 기준이라 두 수치의 모집단이 다르다</li>
+              <li>벤더와 동일한 산식으로 다시 측정한 기준에서 순환참조 <span class="m">195 → 3건</span>, 기술부채비율 <span class="m">3.84% → 3.02%</span>. 자체 측정 파이프라인은 벤더가 못 읽던 alias import까지 해석하므로 모집단이 다르다 — 대외 수치는 벤더 산식으로 통일한다</li>
             </ul>
           </div>
         </div>
@@ -838,11 +871,11 @@
   <section class="case">
     <div class="case-aside rv">
       <div class="case-eyebrow"><span>Test Infrastructure · Compiler Plugin</span></div>
-      <div class="case-stat"><span class="case-stat-num">83.2%</span><span class="case-stat-lbl">자동 라벨 도달률</span></div>
+      <div class="case-stat"><span class="case-stat-num">70~85 인일</span><span class="case-stat-lbl">스스로 반증한 자기 결론</span></div>
     </div>
     <div class="case-main">
       <h2 class="rv">E2E 식별자 자동 부여 — 가장 자신 있던 결론을 스스로 반증했다</h2>
-      <p class="case-thesis rv">이미 발행한 문서를 정정하고 주입 축을 컴파일 타임으로 재설계.</p>
+      <p class="case-thesis rv">이미 발행한 문서를 정정하고 주입 축을 컴파일 타임으로 재설계. 남길 만한 것은 결과가 아니라 검증 과정이다.</p>
       <dl>
         <dt class="rv">반증</dt>
         <dd class="rv">"호스트 1회 배선으로 타 팀 공수 70~85 인일 소거"라는 자기 결론을 적대적 검증으로 기각 —
@@ -852,10 +885,12 @@
         <dd class="rv">Vue 컴파일러 <code>nodeTransform</code>으로 빌드 타임 주입. 템플릿 AST에서 업무 의미를
           추출하는 <span class="m">9단계 폴백</span> + 위치 기반 스냅샷 병합으로 문구 수정이 테스트를
           깨뜨리지 않게. 해결 안 되는 구간은 "해결했다" 대신 미보증 등급으로 정직하게 표기.</dd>
-        <dt class="rv">결과</dt>
-        <dd class="rv">보증 등급 요소 자동 라벨 도달률 <span class="m">83.2%</span>, 식별자 충돌 <span class="m">0건</span>.
-          덤: 플러그인 테스트가 프로덕션과 다른 옵션으로 돌던 사각지대를 발견,
-          빌드 산출물 스냅샷 대조 검증을 추가해 숨은 결함 수정.</dd>
+        <dt class="rv">상태</dt>
+        <dd class="rv">Host 앱 범위로 설계·구현해 MR을 머지했으나 <span class="m">되돌렸고, 현재 운영에는 반영돼 있지 않다</span>.
+          검증 빌드 측정치는 보증 등급 요소 자동 라벨 도달률 <span class="m">83.2%</span>·식별자 충돌 <span class="m">0건</span>이지만
+          프로덕션 성과로 주장하지 않는다.
+          남은 것은 과정이다 — 플러그인 테스트가 프로덕션과 다른 컴파일 옵션으로 돌던 사각지대를 발견하고
+          빌드 산출물 스냅샷 대조 검증을 추가해 숨은 결함 <span class="m">3건</span>을 잡았다.</dd>
       </dl>
       <details class="deep rv">
         <summary>자세히 — 반증의 근거와 설계 장치</summary>
@@ -897,7 +932,7 @@
 
               <rect x="472" y="132" width="180" height="52" rx="4" fill="none" style="stroke: var(--accent)"/>
               <text x="562" y="154" text-anchor="middle" font-size="11.5" font-weight="700" fill="currentColor">보증 등급 식별자</text>
-              <text x="562" y="172" text-anchor="middle" font-size="11" style="fill: var(--accent)">도달률 83.2% · 충돌 0건</text>
+              <text x="562" y="172" text-anchor="middle" font-size="11" style="fill: var(--accent)">검증 빌드 측정치</text>
 
               <line x1="270" y1="260" x2="270" y2="298" stroke="currentColor" stroke-dasharray="4 4" marker-end="url(#ah2)"/>
               <text x="284" y="282" font-size="10.5" fill="currentColor" opacity="0.62">전부 실패 (반복 렌더 구간)</text>
@@ -918,7 +953,7 @@
             <ul>
               <li><strong>9단계 라벨 폴백</strong> — 템플릿 AST에서 i18n 라벨 → aria-label → v-model 경로 → 이벤트 핸들러명 → 아이콘명 순으로 업무 의미를 추출, i18n 사전을 한→영 슬러그 변환에 재활용해 사전 구축 비용 0</li>
               <li><strong>위치 기반 스냅샷 병합</strong> — 슬롯(위치)을 키로 잡고 기존 ID를 유지해, 문구 수정이 E2E 로케이터를 조용히 깨뜨리는 경로를 구조적으로 차단</li>
-              <li><strong>1 노드 → N 인스턴스 대응</strong> — v-for는 :key 접미로 런타임 고유화, 다중 인스턴스 컴포넌트는 호출처가 접두를 내려주는 testid prop 계약 신설(자식 30종·호출처 101곳 자동 배선)</li>
+              <li><strong>1 노드 → N 인스턴스 대응</strong> — v-for는 :key 접미로 런타임 고유화, 다중 인스턴스 컴포넌트는 호출처가 접두를 내려주는 testid prop 계약을 설계(검증 빌드 기준 자식 30종·호출처 101곳)</li>
               <li><strong>미보증 2등급 체계</strong> — 해결 안 되는 반복 렌더 구간은 "해결했다" 대신 미보증 등급으로 표기해 수기 보완 큐로 이관</li>
             </ul>
           </div>
@@ -926,7 +961,7 @@
             <h3>검증</h3>
             <ul>
               <li>플러그인 단위 테스트가 프로덕션과 다른 컴파일 옵션(prefixIdentifiers off)으로 돌고 있음을 발견 — 전체 3,500여 건 그린 상태에서 실제 빌드에는 주입되지 않던 케이스를 빌드 산출물 덤프·스냅샷 대조로 적발·수정</li>
-              <li>보증 등급 요소 자동 라벨 도달률 83.2% (완료 기준 80%) · ID 211개 충돌 0 · 수기 100곳 예상 작업을 자동화로 대체</li>
+              <li>검증 빌드에서 보증 등급 요소 자동 라벨 도달률 83.2%(완료 기준 80%) · ID 211개 충돌 0. 다만 이 MR은 되돌려졌고 소비처가 없어, 대체된 수기 작업 수는 주장하지 않는다</li>
             </ul>
           </div>
         </div>
@@ -937,7 +972,7 @@
   <section class="case">
     <div class="case-aside rv">
       <div class="case-eyebrow"><span>Test Infrastructure · Storybook</span></div>
-      <div class="case-stat"><span class="case-stat-num">136장</span><span class="case-stat-lbl">8테마 비주얼 회귀 baseline</span></div>
+      <div class="case-stat"><span class="case-stat-num">264장</span><span class="case-stat-lbl">8테마 비주얼 회귀 baseline</span></div>
     </div>
     <div class="case-main">
       <h2 class="rv">Storybook을 보여주는 도구에서 막아주는 게이트로</h2>
@@ -954,8 +989,8 @@
           portable stories(<code>composeStories</code>)로 전 스토리를 jsdom에 실제 마운트한다 —
           권장 경로 <code>addon-vitest</code>는 CI에 브라우저 인프라를 요구해 배제했다.
           비주얼 회귀는 솔루션 <span class="m">4종</span> × 라이트/다크 <span class="m">8테마</span>에서
-          컴포넌트 <span class="m">17개</span> 대표 샷 <span class="m">136장</span>을 리눅스 컨테이너
-          baseline으로 고정했다.</dd>
+          컴포넌트 <span class="m">17개</span> 대표 샷 <span class="m">136장</span>으로 시작해 현재
+          <span class="m">264장</span>까지 늘리고, 리눅스 컨테이너 baseline으로 고정했다.</dd>
         <dt class="rv">검증</dt>
         <dd class="rv">게이트가 실제로 무는지 역방향으로 확인했다 — 스토리를 고의로 throw 시켜 exit=1,
           스킨 CSS 색 <span class="m">294개</span>를 치환해 정확히 해당 조합 <span class="m">17장</span>만
@@ -965,7 +1000,7 @@
           방치 경로를 차단했다.</dd>
         <dt class="rv">결과</dt>
         <dd class="rv">공통 컴포넌트 패키지 CI 검증 <span class="m">0 → 전량</span>,
-          비주얼 회귀 <span class="m">136장</span>.</dd>
+          비주얼 회귀 <span class="m">264장</span>.</dd>
         <dt class="rv">스택</dt>
         <dd class="tags rv"><span>Storybook</span><span>portable stories</span><span>Vitest</span><span>jsdom</span><span>GitLab CI</span></dd>
       </dl>
@@ -1002,9 +1037,11 @@
     <div class="case-main">
       <h2 class="rv">그 밖의 작업</h2>
       <ul class="misc rv">
-        <li><strong>접근 제어(RBAC) 개편 — 설계 선행으로 무음 데이터 손실 차단.</strong> 코드 작성 전 기존 구현 전량 분석과 기획 대조로 요구사항의 논리 모순 4건을 해소하고, 저장 시 권한이 조용히 소실되는 경로 3종을 pass-through 설계로 차단. 프론트 설계 변경으로 백엔드 협의 항목 <span class="m">6건 → 3건</span></li>
-        <li><strong>통과하는 테스트 뒤에 숨은 결함 규명.</strong> 한 번도 동작한 적 없던 30초 타임아웃 안전망(setTimeout 콜백의 throw가 try/catch에 도달하지 못하는데 fake timer 특성으로 테스트는 통과), 로그아웃 무한 리로드 루프(HTTP-only 쿠키 + 세션 재검증 상태 불일치), 프로덕션 console·소스맵 유출(minifier 불일치로 이중 무력화된 설정) — 수정 전 소스로 되돌려 신규 테스트가 전부 실패함을 확인하는 역방향 검증을 습관화</li>
+        <li><strong>접근 제어(RBAC) 개편 — 설계 선행으로 무음 데이터 손실 차단.</strong> 플랫폼 작업과 병행해 제품 화면도 직접 만든다 — 실시간 모니터링(WebSocket)·서버 이벤트 스트리밍(SSE)·eCharts 대시보드. 권한 관리 화면군 개편에서는 코드 작성 전 기존 구현 전량 분석과 기획 대조로 요구사항의 논리 모순 4건을 해소하고, 저장 시 권한이 조용히 소실되는 경로 3종을 pass-through 설계로 차단. 프론트 설계 변경으로 백엔드 협의 항목 <span class="m">6건 → 3건</span></li>
+        <li><strong>통과하는 테스트 뒤에 숨은 결함 규명.</strong> 한 번도 동작한 적 없던 30초 타임아웃 안전망(setTimeout 콜백의 throw가 try/catch에 도달하지 못하는데 fake timer 특성으로 테스트는 통과), 로그아웃 무한 리로드 루프(HTTP-only 쿠키 + 세션 재검증 상태 불일치), 프로덕션 console·소스맵 유출(minifier 불일치로 이중 무력화된 설정. Sentry 업로드 경로에서 <code>.map</code> 삭제 후에도 <code>sourceMappingURL</code> 주석이 남아 소스맵 존재 힌트를 노출하던 것은 <code>hidden</code>으로 전환) — 수정 전 소스로 되돌려 신규 테스트가 전부 실패함을 확인하는 역방향 검증을 습관화</li>
         <li><strong>사내 AI 개발 인프라 구축.</strong> 팀 공용 서버에 AI 게이트웨이 + 로컬 LLM 라우팅 환경을 구축. 실행 전 감사로 용량 전제 8배 과대평가 등 치명 결함 3건 차단, 구축 중 관리자 기본 비밀번호 노출을 실제 로그인으로 실증하고 자격증명 연결 전 차단</li>
+        <li><strong>Vite 8(Rolldown/Oxc)·Vitest 4 마이그레이션.</strong> 마이그레이션 중 최상위 esbuild 옵션이 무시되고 Rolldown의 <code>dropConsole</code>이 <code>console.error</code>·<code>warn</code>까지 제거한다는 것을 확인해, 제거 대상을 선별하는 플러그인을 직접 작성. 앞서 이중으로 무력화돼 있던 프로덕션 console 제거 정책을 새 번들러에서도 유지했다</li>
+        <li><strong>Strangler 마이그레이션 완주.</strong> 테이블 렌더 계층을 공통 라이브러리로 이관하는 작업을 소비처 <span class="m">21곳</span> 규모로 완료하고, feature flag와 레거시 렌더 경로까지 제거해 단일 경로로 확정(<span class="m">순감 1,271줄</span>). 컴포넌트 계층을 걷어낼 때 Vue attribute fallthrough 대상이 이동하는 2차 파급을 사전에 짚어 특성화 테스트로 고정 — 마이그레이션은 새 경로를 켠 시점이 아니라 옛 경로를 지운 시점에 끝난다</li>
         <li><strong>i18n 동기화 무음 삭제 규명.</strong> 다국어 파이프라인이 수동 편집분을 경고 없이 삭제하는 구조적 결함을 규명 — 초기 관측치의 74%가 diff 오탐(줄 이동)임을 시트 덤프·로직 재현으로 걸러내 실제 영향을 5건으로 특정, 과거 동일 원인의 키 266개 소실 이력까지 추적</li>
       </ul>
     </div>
@@ -1021,7 +1058,10 @@
         <dd class="rv"><span class="cv-role">오케스트로 · Frontend Engineer</span>
           <span class="cv-meta">2023.09 ~ 현재</span>
           <span class="cv-note">온프레미스 클라우드 관리 플랫폼(B2B 어드민) — 프론트엔드 플랫폼·빌드 아키텍처</span>
-          <span class="cv-note">[금융 도메인] KB IQ+ 레거시 시스템 개선(약 3개월) — KB 통합관리포털, ActiveX 제거·표준 웹 전환, JSP + Vue.js</span></dd>
+          <span class="cv-note">[금융 도메인] KB IQ+ 레거시 시스템 개선(약 3개월) — KB 통합관리포털, ActiveX 제거·표준 웹 전환, JSP + Vue.js</span>
+          <div class="cv-item"><span class="cv-role">자이트론 · 자율주행 SW 개발팀 인턴</span>
+            <span class="cv-meta">2020.09 ~ 2020.12</span>
+            <span class="cv-note">모형차 기반 자율주행 SW 개발 — YOLO 기반 사람 트래킹, 자율주행 대회 베이스코드 제작 (Python · ROS · AutoWare)</span></div></dd>
         <dt class="rv">교육</dt>
         <dd class="rv">
           <div class="cv-item"><span class="cv-role">삼성 청년 SW 아카데미(SSAFY) 8기</span>
@@ -1031,6 +1071,9 @@
             <span class="cv-meta">2014.03 ~ 2021.02</span>
             <span class="cv-note">고용노동부장관상 수상(AI 스마트 양식 시스템 '만선') · 한국정보처리학회 논문 게재</span></div>
         </dd>
+        <dt class="rv">자격</dt>
+        <dd class="rv"><span class="cv-role">SQLD</span>
+          <span class="cv-meta">SQL 개발자 · 2022.12</span></dd>
       </dl>
     </div>
   </section>
@@ -1356,6 +1399,7 @@
     counters.forEach(function (el) { countIO.observe(el); });
   })();
 </script>
+
 
 </body>
 </html>
