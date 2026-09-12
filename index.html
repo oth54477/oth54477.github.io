@@ -786,7 +786,7 @@
               <table>
                 <thead><tr><th>병목</th><th>원인 (실측)</th><th>조치</th><th>효과</th></tr></thead>
                 <tbody>
-                  <tr><td>정적분석 스캔</td><td>순회 86만 경로 — pnpm 심볼릭 링크가 실파일 7.5만 개를 33만 경로로 증폭, 제외 설정은 순회를 막지 않음</td><td>스캔 루트를 실제 대상만 열거 (순회 → 약 2.8만 경로)</td><td class="fx">350 → 80초</td></tr>
+                  <tr><td>정적분석 스캔</td><td>제외 설정이 분석 대상에서만 빼고 순회 자체는 막지 않음 — pnpm 심볼릭 링크가 실파일 <span class="m">7.5만 개</span>를 <span class="m">33만 경로</span>로 부풀린다</td><td>스캔 루트를 실제 대상만 열거 (순회 → 약 2.8만 경로)</td><td class="fx">350 → 80초</td></tr>
                   <tr><td>캐시 아카이빙</td><td>4개 잡이 동일한 2.5GB 캐시를 각각 push</td><td>쓰기를 임계 경로 밖 잡으로 한정</td><td class="fx">잡당 −35~39초</td></tr>
                   <tr><td>테스트 환경</td><td>전역 jsdom 설정이 파일 단위 환경 선언과 충돌 — DOM 불필요한 167개 파일이 비용 지불</td><td>기본값 반전 + 누락 독블록 6개 보강 (전수 실행으로 확인)</td><td class="fx">91 → 59초</td></tr>
                   <tr><td>러너 자원</td><td>호스트 14코어 중 4개만 VM에 할당</td><td>VM 8코어로 확장 (공용 머신이라 메모리는 불변)</td><td class="fx">vitest 124 → 58초</td></tr>
@@ -1039,7 +1039,7 @@
       <ul class="misc rv">
         <li><strong>접근 제어(RBAC) 개편 — 설계 선행으로 무음 데이터 손실 차단.</strong> 플랫폼 작업과 병행해 제품 화면도 직접 만든다 — 실시간 모니터링(WebSocket)·서버 이벤트 스트리밍(SSE)·eCharts 대시보드. 권한 관리 화면군 개편에서는 코드 작성 전 기존 구현 전량 분석과 기획 대조로 요구사항의 논리 모순 4건을 해소하고, 저장 시 권한이 조용히 소실되는 경로 3종을 pass-through 설계로 차단. 프론트 설계 변경으로 백엔드 협의 항목 <span class="m">6건 → 3건</span></li>
         <li><strong>통과하는 테스트 뒤에 숨은 결함 규명.</strong> 한 번도 동작한 적 없던 30초 타임아웃 안전망(setTimeout 콜백의 throw가 try/catch에 도달하지 못하는데 fake timer 특성으로 테스트는 통과), 로그아웃 무한 리로드 루프(HTTP-only 쿠키 + 세션 재검증 상태 불일치), 프로덕션 console·소스맵 유출(minifier 불일치로 이중 무력화된 설정. Sentry 업로드 경로에서 <code>.map</code> 삭제 후에도 <code>sourceMappingURL</code> 주석이 남아 소스맵 존재 힌트를 노출하던 것은 <code>hidden</code>으로 전환) — 수정 전 소스로 되돌려 신규 테스트가 전부 실패함을 확인하는 역방향 검증을 습관화</li>
-        <li><strong>사내 AI 개발 인프라 구축.</strong> 팀 공용 서버에 AI 게이트웨이 + 로컬 LLM 라우팅 환경을 구축. 실행 전 감사로 용량 전제 8배 과대평가 등 치명 결함 3건 차단, 구축 중 관리자 기본 비밀번호 노출을 실제 로그인으로 실증하고 자격증명 연결 전 차단</li>
+        <li><strong>사내 AI 개발 인프라 구축.</strong> 팀 공용 서버에 AI 게이트웨이 + 로컬 LLM 라우팅 환경을 구축. 계획서의 가용 메모리 전제(<span class="m">실측 237MB</span>)는 실행 전 감사로, 관리자 기본 비밀번호 사내망 노출은 실제 로그인으로 실증해 자격증명을 연결하기 전에 차단</li>
         <li><strong>Vite 8(Rolldown/Oxc)·Vitest 4 마이그레이션.</strong> 마이그레이션 중 최상위 esbuild 옵션이 무시되고 Rolldown의 <code>dropConsole</code>이 <code>console.error</code>·<code>warn</code>까지 제거한다는 것을 확인해, 제거 대상을 선별하는 플러그인을 직접 작성. 앞서 이중으로 무력화돼 있던 프로덕션 console 제거 정책을 새 번들러에서도 유지했다</li>
         <li><strong>Strangler 마이그레이션 완주.</strong> 테이블 렌더 계층을 공통 라이브러리로 이관하는 작업을 소비처 <span class="m">21곳</span> 규모로 완료하고, feature flag와 레거시 렌더 경로까지 제거해 단일 경로로 확정(<span class="m">순감 1,271줄</span>). 컴포넌트 계층을 걷어낼 때 Vue attribute fallthrough 대상이 이동하는 2차 파급을 사전에 짚어 특성화 테스트로 고정 — 마이그레이션은 새 경로를 켠 시점이 아니라 옛 경로를 지운 시점에 끝난다</li>
         <li><strong>i18n 동기화 무음 삭제 규명.</strong> 다국어 파이프라인이 수동 편집분을 경고 없이 삭제하는 구조적 결함을 규명 — 초기 관측치의 74%가 diff 오탐(줄 이동)임을 시트 덤프·로직 재현으로 걸러내 실제 영향을 5건으로 특정, 과거 동일 원인의 키 266개 소실 이력까지 추적</li>
