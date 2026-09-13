@@ -91,6 +91,7 @@
     display: flex; flex-direction: column;
   }
   .hero-sub { margin-bottom: auto; }
+  .print-id { display: none; }  /* 인쇄 전용 */
   .hero-top {
     display: flex; justify-content: space-between; align-items: baseline;
     gap: 48px; margin-bottom: 30px;
@@ -418,7 +419,15 @@
     /* 섹션 통째 유지는 한 페이지 넘는 섹션에서 무력화돼 앞 페이지를 비운다.
        대신 머리(eyebrow·제목·테제)와 꼬리(링크·태그 행)가 홀로 남지 않게만 잡는다 */
     .case-eyebrow, section.case h2, .case-thesis { break-after: avoid; }
-    .case-main > dl, .case-links, .tags, .case-thesis { break-inside: avoid; }
+    .case-links, .tags, .case-thesis, section.case h2 { break-inside: avoid; }
+    ul.misc { break-before: avoid; }
+    /* dl은 화면에서 grid인데 Chrome은 grid 내부를 페이지 분할하지 않아 섹션이 통째로 다음 페이지로 점프한다.
+       인쇄에서는 라벨+본문을 inline-block 한 줄로 묶는다 — 한 행은 원자적으로 함께 움직이고, 행 사이에서 끊긴다 */
+    .case-main > dl { display: block; }
+    .case-main > dl > dt { display: inline-block; vertical-align: top; width: 72px; margin: 0; }
+    .case-main > dl > dd { display: inline-block; vertical-align: top; width: calc(100% - 78px); margin: 0 0 14px; break-inside: avoid; }
+    .tags span { white-space: nowrap; }            /* 칩 라벨이 칩 안에서 줄바꿈되지 않게 */
+    ul.misc { columns: auto; column-count: auto; }  /* 다단 컨테이너면 break-before: avoid가 무시돼 제목이 고아로 남는다 */
     .case-links, .tags, details.deep { break-before: avoid; }
     details.deep summary { break-after: avoid; }  /* 요약줄만 페이지 끝에 남지 않게 */
     /* 화면용 .artifacts 패딩은 선택자가 더 구체적이라 위 규칙에 지지 않는다. 따로 눌러준다 */
@@ -440,7 +449,6 @@
     .case-stat { display: block; margin: 0; padding: 0; border-top: none; } /* 인쇄 폭은 860px 미만이라 모바일 규칙의 display:none을 되돌린다 */
     .case-stat-num, .case-stat-lbl { display: inline; font-size: 12px; margin: 0; }
     .case-stat-lbl { margin-left: 5px; }
-    ul.misc { columns: 1; }
     ul.misc li { margin-bottom: 12px; }
     footer { display: block; padding: 26px 0; }
     .footer-label { margin-bottom: 6px; }
@@ -458,9 +466,12 @@
     .case-links a, .tags span { background: none; }
     details.deep summary { padding: 8px 0 4px; font-size: 11.5px; letter-spacing: 0.04em; }
     details.deep summary::after { display: none; }
+    details.deep summary::before, details.deep[open] summary::before { content: none; }  /* 전부 펼친 인쇄에서 "−" 마커는 정보가 없다 */
+    .case-thesis, .hero-sub { max-width: none; }
+    .print-id { display: block; font-size: 11px; letter-spacing: 0.02em; color: var(--muted); margin: 0 0 14px; }
     figure { overflow-x: visible; }
     figure svg { min-width: 0; }
-    pre, .tbl-wrap table, figure, .deep-body > div { break-inside: avoid; }
+    pre, .tbl-wrap table, figure, .deep-body li { break-inside: avoid; }  /* 리스트 블록은 항목 단위로 이어지게 */
   }
 </style>
 </head>
@@ -470,6 +481,7 @@
 <div class="wrap">
   <header>
     <canvas id="federation-field" aria-hidden="true"></canvas>
+    <p class="print-id">오태훈 · Frontend Engineer · oth5447@naver.com · https://www.th-oh.site</p>
     <div class="hero-top">
       <p class="eyebrow rv">Frontend Engineer · Platform &amp; Build Architecture</p>
       <div class="hero-metrics rv">
