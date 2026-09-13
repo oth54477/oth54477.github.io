@@ -414,7 +414,13 @@
     .hero-metrics .metric .label { font-size: 10px; }
     body::before { display: none; }
     #federation-field { display: none; }
-    section.case { display: block; padding: 26px 0; break-inside: avoid; }
+    section.case { display: block; padding: 26px 0; break-inside: auto; }
+    /* 섹션 통째 유지는 한 페이지 넘는 섹션에서 무력화돼 앞 페이지를 비운다.
+       대신 머리(eyebrow·제목·테제)와 꼬리(링크·태그 행)가 홀로 남지 않게만 잡는다 */
+    .case-eyebrow, section.case h2, .case-thesis { break-after: avoid; }
+    .case-main > dl, .case-links, .tags, .case-thesis { break-inside: avoid; }
+    .case-links, .tags, details.deep { break-before: avoid; }
+    details.deep summary { break-after: avoid; }  /* 요약줄만 페이지 끝에 남지 않게 */
     /* 화면용 .artifacts 패딩은 선택자가 더 구체적이라 위 규칙에 지지 않는다. 따로 눌러준다 */
     section.case.artifacts { padding: 18px 0; }
     /* 본문 링크는 라벨만 남긴다 — URL을 문장 사이에 덧붙이지 않는다 */
@@ -1096,6 +1102,10 @@
       d.dataset.wasOpen = d.open ? '1' : '';
       d.open = true;
     });
+    // 카운트업 도중 인쇄되면 중간값이 종이에 남는다 — 최종값으로 스냅
+    document.querySelectorAll('[data-count]').forEach(function (el) {
+      el.textContent = String(parseInt(el.getAttribute('data-count'), 10));
+    });
   });
   window.addEventListener('afterprint', function () {
     document.querySelectorAll('details.deep').forEach(function (d) {
@@ -1382,6 +1392,7 @@
     // start:'top 85%' == 하단 15% 깎기. 이징은 GSAP power1.out == easeOutQuad
     function countUp(el) {
       var end = parseInt(el.getAttribute('data-count'), 10), t0 = null, D = 1100;
+      if (matchMedia('print').matches) { el.textContent = fmt(end); return; }
       function step(now) {
         if (t0 === null) t0 = now;
         var t = Math.min((now - t0) / D, 1);
