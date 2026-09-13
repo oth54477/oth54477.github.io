@@ -517,7 +517,7 @@
     </div>
     <div class="case-main">
       <h2 class="rv">기술 스택</h2>
-      <p class="case-thesis rv">앱 4 · 공통 패키지 3 · 서브모듈 5 · 원격 저장소 6을 단일 이미지로 통합하는 환경에서 쓰는 것들.</p>
+      <p class="case-thesis rv">앱 4 · 공통 패키지 3 · 원격 저장소 6을 단일 이미지로 통합하는 환경에서 쓰는 것들.</p>
       <dl>
         <dt class="rv">언어</dt>
         <dd class="tags rv"><span>TypeScript</span><span>JavaScript</span></dd>
@@ -530,7 +530,7 @@
         <dt class="rv">테스트·품질</dt>
         <dd class="tags rv"><span>Vitest</span><span>Storybook (portable stories)</span><span>SonarQube</span><span>dependency-cruiser</span></dd>
         <dt class="rv">CI·인프라</dt>
-        <dd class="tags rv"><span>GitLab CI</span><span>Jenkins</span><span>Docker</span><span>Kubernetes (on-prem 배포 대상)</span><span>POSIX Shell</span><span>Sentry</span></dd>
+        <dd class="tags rv"><span>GitLab CI</span><span>Jenkins</span><span>Docker</span><span>Kubernetes (on-prem 배포 대상)</span><span>POSIX Shell</span><span>Sentry (소스맵 업로드 경로)</span></dd>
         <dt class="rv">AI 개발 도구</dt>
         <dd class="tags rv"><span>LLM 게이트웨이 구축·운영</span><span>Ollama (로컬 모델)</span><span>Claude Code</span><span>Codex</span></dd>
       </dl>
@@ -623,7 +623,7 @@
           개발 서버 HMR이 <span class="m">10초대에서 1초 미만</span>으로 바뀐 것은 그 덕에 따라온 이득이다.
           이어 6개월 운영 데이터로 런타임 유연성의 비용(<span class="m">파드 4개 상주·월 2~3건</span> 통합 장애)을 정량화해
           통합 빌드 아키텍처 전환을 설계했다 —
-          <span class="q">자신이 붙인 구조를 데이터로 부정하는 것도 같은 사이클의 일부다.</span></dd>
+          <span class="q">자신이 붙인 구조의 비용을 데이터로 측정해 배포 단위를 다시 그리는 것도 같은 사이클의 일부다.</span></dd>
       </dl>
       <details class="deep rv">
         <summary>자세히 — 구조도와 운영 중 잡은 결함</summary>
@@ -719,7 +719,7 @@
         <dt class="rv">접근</dt>
         <dd class="rv">소스 핀으로 결합을 끊었다 — 트리거한 솔루션만 브랜치 최신, 나머지는 마지막 성공 커밋으로 고정.
           파이프라인 로직을 검증 가능한 POSIX 셸로 분리해 <span class="m">특성화 테스트 65건</span>으로 고정하고,
-          커밋 1개로 무력화되는 킬 스위치를 함께 설계해 롤백 MTTR을 줄였다.</dd>
+          커밋 1개로 되돌릴 수 있는 킬 스위치를 함께 설계했다.</dd>
         <dt class="rv">자동화</dt>
         <dd class="rv">실패 사실만 알리던 CI 리포트를, SonarQube Web API로 깨진 품질 게이트 조건과 신규 이슈를
           조회해 MR 댓글에 표로 붙이도록 바꿨다. 초안이던 에러 키워드 매칭이 실제 실패 로그
@@ -744,7 +744,7 @@
           <div>
             <h3>사람이 하던 확인을 옮긴 자리</h3>
             <ul>
-              <li><strong>서비스 상태 수동 확인 → 헬스체크.</strong> 호스트 1대·점검 항목 9개 규모에 맞는 최소 구성(cron + 셸 + 상태 변화 시에만 알림)을 택하고, 정상·실패·접속불가 <span class="m">3경로</span>를 전부 주입 테스트</li>
+              <li><strong>서비스 상태 수동 확인 → 헬스체크.</strong> 호스트 1대·점검 항목 9개 규모에 맞는 최소 구성(cron + 셸 + 상태 변화 시에만 알림)을 택하고, 정상·실패·접속불가 <span class="m">3경로</span>를 직접 주입해 확인</li>
               <li><strong>자기 판정의 철회.</strong> 사내 위키에 직접 게시한 "서비스 자동 기동 미등록" 판정 <span class="m">3건</span>이 조사 방법 결함에 의한 오진임을 스스로 발견해 철회하고, 오진 과정 자체를 재사용 가능한 판정 절차로 남겼다</li>
               <li><strong>subtree 전환으로 끊긴 blame 복구.</strong> 근본 원인을 계보 단절로 규명하고 히스토리 재작성 없이 <code>git replace --graft</code>로 복구 — 원격 저장소 <span class="m">5개</span> 재동기화 비용 없이 코드 소유권 추적성 회복</li>
               <li><strong>ESLint 커스텀 규칙.</strong> 팀 컨벤션을 규칙으로 자동화해 형식적 지적을 리뷰에서 제거</li>
@@ -870,6 +870,67 @@
 
   <section class="case">
     <div class="case-aside rv">
+      <div class="case-eyebrow"><span>Test Infrastructure · Storybook</span></div>
+      <div class="case-stat"><span class="case-stat-num">264장</span><span class="case-stat-lbl">8테마 비주얼 회귀 baseline</span></div>
+    </div>
+    <div class="case-main">
+      <h2 class="rv">Storybook을 보여주는 도구에서 막아주는 게이트로</h2>
+      <p class="case-thesis rv"><code>storybook build</code>가 "번들이 만들어지는가"만 보고 스토리 런타임 실패를 통과시키던 구멍을 막았다.</p>
+      <dl>
+        <dt class="rv">문제</dt>
+        <dd class="rv">Storybook 두 벌 중 하나는 CI 검증도 배포도 없었고, <code>storybook build</code>는
+          번들 생성만 확인해 스토리 런타임 실패를 통과시켰다. 조사 중 공통 컴포넌트 패키지 테스트
+          <span class="m">23개</span>가 CI에서 한 번도 돌지 않고 있었다는 사실도 발견했다 —
+          전 잡이 host만 <code>--filter</code>하고 있었다.</dd>
+        <dt class="rv">접근</dt>
+        <dd class="rv">중복 Storybook 한 벌을 철거하고(<span class="m">1,370줄</span>) 설정만 있고 무동작인
+          죽은 의존성 <span class="m">3종</span>을 제거했다. 렌더 스모크는
+          portable stories(<code>composeStories</code>)로 전 스토리를 jsdom에 실제 마운트한다 —
+          권장 경로 <code>addon-vitest</code>는 CI에 브라우저 인프라를 요구해 배제했다.
+          비주얼 회귀는 솔루션 <span class="m">4종</span> × 라이트/다크 <span class="m">8테마</span>에서
+          컴포넌트 <span class="m">17개</span> 대표 샷 <span class="m">136장</span>으로 시작해 현재
+          <span class="m">264장</span>까지 늘리고, 리눅스 컨테이너 baseline으로 고정했다.</dd>
+        <dt class="rv">검증</dt>
+        <dd class="rv">게이트가 실제로 무는지 역방향으로 확인했다 — 스토리를 고의로 throw 시켜 exit=1,
+          스킨 CSS 색 <span class="m">294개</span>를 치환해 정확히 해당 조합 <span class="m">17장</span>만
+          실패하고 나머지는 전부 통과함을 확인. 로컬 macOS에서는 안 드러나는 IPv6 바인딩 버그
+          (<code>vite preview</code>가 <code>::1</code>에만 붙어 CI 컨테이너에서 타임아웃)도 사전에 검출했다.
+          baseline 갱신 절차를 문서로 고정해 "스킨을 의도적으로 바꾸면 잡이 상시 빨간불"이 되는
+          방치 경로를 차단했다.</dd>
+        <dt class="rv">결과</dt>
+        <dd class="rv">공통 컴포넌트 패키지 CI 검증 <span class="m">0 → 전량</span>,
+          비주얼 회귀 <span class="m">264장</span>.</dd>
+        <dt class="rv">스택</dt>
+        <dd class="tags rv"><span>Storybook</span><span>portable stories</span><span>Vitest</span><span>jsdom</span><span>GitLab CI</span></dd>
+      </dl>
+      <details class="deep rv">
+        <summary>자세히 — 배제한 권장 경로, 매니저 브랜딩, 계약 구멍</summary>
+        <div class="deep-body">
+          <div>
+            <h3>왜 addon-vitest를 배제했나</h3>
+            <ul>
+              <li>권장 경로인 <code>@storybook/addon-vitest</code>는 browser mode와 Playwright를 요구한다 — 게이트 <span class="m">1개</span>를 위해 브라우저 런타임을 CI에 들이는 비용은 이 규모에서 과하다고 판단해 대체 경로를 택했다</li>
+              <li>같은 목적은 portable stories로 jsdom에서 달성했고, 브라우저 기반 E2E 실행 레이어는 별도 축으로 분리했다 — 판정의 전제가 규모이므로 규모가 달라지면 다시 평가한다</li>
+            </ul>
+          </div>
+          <div>
+            <h3>매니저 브랜딩과 사이드바 명명</h3>
+            <ul>
+              <li>색을 하드코딩하는 대신 디자인 토큰 JSON을 직접 해석했다 — 매니저는 esbuild 번들이라 Vite alias와 <code>?inline</code>을 쓸 수 없다</li>
+              <li>사이드바 명명을 디렉터리 미러로 규칙화했다</li>
+            </ul>
+          </div>
+          <div>
+            <h3>별건으로 분리한 계약 구멍</h3>
+            <p>토큰이 주입돼도 antd 기본색이 이기는 스킨 계약 구멍도 별건으로 특정했다.</p>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="case">
+    <div class="case-aside rv">
       <div class="case-eyebrow"><span>Test Infrastructure · Compiler Plugin</span></div>
       <div class="case-stat"><span class="case-stat-num">70~85 인일</span><span class="case-stat-lbl">스스로 반증한 자기 결론</span></div>
     </div>
@@ -969,67 +1030,6 @@
     </div>
   </section>
 
-  <section class="case">
-    <div class="case-aside rv">
-      <div class="case-eyebrow"><span>Test Infrastructure · Storybook</span></div>
-      <div class="case-stat"><span class="case-stat-num">264장</span><span class="case-stat-lbl">8테마 비주얼 회귀 baseline</span></div>
-    </div>
-    <div class="case-main">
-      <h2 class="rv">Storybook을 보여주는 도구에서 막아주는 게이트로</h2>
-      <p class="case-thesis rv"><code>storybook build</code>가 "번들이 만들어지는가"만 보고 스토리 런타임 실패를 통과시키던 구멍을 막았다.</p>
-      <dl>
-        <dt class="rv">문제</dt>
-        <dd class="rv">Storybook 두 벌 중 하나는 CI 검증도 배포도 없었고, <code>storybook build</code>는
-          번들 생성만 확인해 스토리 런타임 실패를 통과시켰다. 조사 중 공통 컴포넌트 패키지 테스트
-          <span class="m">23개</span>가 CI에서 한 번도 돌지 않고 있었다는 사실도 발견했다 —
-          전 잡이 host만 <code>--filter</code>하고 있었다.</dd>
-        <dt class="rv">접근</dt>
-        <dd class="rv">중복 Storybook 한 벌을 철거하고(<span class="m">1,370줄</span>) 설정만 있고 무동작인
-          죽은 의존성 <span class="m">3종</span>을 제거했다. 렌더 스모크는
-          portable stories(<code>composeStories</code>)로 전 스토리를 jsdom에 실제 마운트한다 —
-          권장 경로 <code>addon-vitest</code>는 CI에 브라우저 인프라를 요구해 배제했다.
-          비주얼 회귀는 솔루션 <span class="m">4종</span> × 라이트/다크 <span class="m">8테마</span>에서
-          컴포넌트 <span class="m">17개</span> 대표 샷 <span class="m">136장</span>으로 시작해 현재
-          <span class="m">264장</span>까지 늘리고, 리눅스 컨테이너 baseline으로 고정했다.</dd>
-        <dt class="rv">검증</dt>
-        <dd class="rv">게이트가 실제로 무는지 역방향으로 확인했다 — 스토리를 고의로 throw 시켜 exit=1,
-          스킨 CSS 색 <span class="m">294개</span>를 치환해 정확히 해당 조합 <span class="m">17장</span>만
-          실패하고 나머지는 전부 통과함을 확인. 로컬 macOS에서는 안 드러나는 IPv6 바인딩 버그
-          (<code>vite preview</code>가 <code>::1</code>에만 붙어 CI 컨테이너에서 타임아웃)도 사전에 검출했다.
-          baseline 갱신 절차를 문서로 고정해 "스킨을 의도적으로 바꾸면 잡이 상시 빨간불"이 되는
-          방치 경로를 차단했다.</dd>
-        <dt class="rv">결과</dt>
-        <dd class="rv">공통 컴포넌트 패키지 CI 검증 <span class="m">0 → 전량</span>,
-          비주얼 회귀 <span class="m">264장</span>.</dd>
-        <dt class="rv">스택</dt>
-        <dd class="tags rv"><span>Storybook</span><span>portable stories</span><span>Vitest</span><span>jsdom</span><span>GitLab CI</span></dd>
-      </dl>
-      <details class="deep rv">
-        <summary>자세히 — 배제한 권장 경로, 매니저 브랜딩, 계약 구멍</summary>
-        <div class="deep-body">
-          <div>
-            <h3>왜 addon-vitest를 배제했나</h3>
-            <ul>
-              <li>권장 경로인 <code>@storybook/addon-vitest</code>는 browser mode와 Playwright를 요구한다 — 게이트 <span class="m">1개</span>를 위해 브라우저 런타임을 CI에 들이는 비용은 이 규모에서 과하다고 판단해 대체 경로를 택했다</li>
-              <li>같은 목적은 portable stories로 jsdom에서 달성했고, 브라우저 기반 E2E 실행 레이어는 별도 축으로 분리했다 — 판정의 전제가 규모이므로 규모가 달라지면 다시 평가한다</li>
-            </ul>
-          </div>
-          <div>
-            <h3>매니저 브랜딩과 사이드바 명명</h3>
-            <ul>
-              <li>색을 하드코딩하는 대신 디자인 토큰 JSON을 직접 해석했다 — 매니저는 esbuild 번들이라 Vite alias와 <code>?inline</code>을 쓸 수 없다</li>
-              <li>사이드바 명명을 디렉터리 미러로 규칙화했다</li>
-            </ul>
-          </div>
-          <div>
-            <h3>별건으로 분리한 계약 구멍</h3>
-            <p>토큰이 주입돼도 antd 기본색이 이기는 스킨 계약 구멍도 별건으로 특정했다.</p>
-          </div>
-        </div>
-      </details>
-    </div>
-  </section>
-
   <section class="case wide">
     <div class="case-aside rv">
       <div class="case-eyebrow"><span>Selected Work</span></div>
@@ -1058,7 +1058,7 @@
         <dd class="rv"><span class="cv-role">오케스트로 · Frontend Engineer</span>
           <span class="cv-meta">2023.09 ~ 현재</span>
           <span class="cv-note">온프레미스 클라우드 관리 플랫폼(B2B 어드민) — 프론트엔드 플랫폼·빌드 아키텍처</span>
-          <span class="cv-note">[금융 도메인] KB IQ+ 레거시 시스템 개선(약 3개월) — KB 통합관리포털, ActiveX 제거·표준 웹 전환, JSP + Vue.js</span>
+          <span class="cv-note">[금융 도메인] KB IQ+ 레거시 시스템 개선(2023.10 ~ 2023.12) — KB 통합관리포털, ActiveX 제거·표준 웹 전환, JSP + Vue.js</span>
           <div class="cv-item"><span class="cv-role">자이트론 · 자율주행 SW 개발팀 인턴</span>
             <span class="cv-meta">2020.09 ~ 2020.12</span>
             <span class="cv-note">모형차 기반 자율주행 SW 개발 — YOLO 기반 사람 트래킹, 자율주행 대회 베이스코드 제작 (Python · ROS · AutoWare)</span></div></dd>
